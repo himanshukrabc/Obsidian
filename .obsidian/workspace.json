@@ -1,0 +1,249 @@
+{
+  "main": {
+    "id": "b05369334d70c099",
+    "type": "split",
+    "children": [
+      {
+        "id": "6aa72e0b6a953450",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bb2f50a695ec32ac",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "OOPs.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "OOPs"
+            }
+          },
+          {
+            "id": "1c06cb9f28fae991",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Class Relations.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Class Relations"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c90f73113cc48230",
+    "type": "split",
+    "children": [
+      {
+        "id": "747629af76456f9c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2f39623344cf8bb7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "5cd902834162ebe0",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "2573a95c6122449c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "80131ccbed5be14b",
+    "type": "split",
+    "children": [
+      {
+        "id": "4fc4c10bae8c2c19",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fe5ba28f82ee1f6b",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Class Relations.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Class Relations"
+            }
+          },
+          {
+            "id": "e706d05012d78c12",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Class Relations.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Class Relations"
+            }
+          },
+          {
+            "id": "5069604db7ed11c0",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "4eb830ccc164fa8b",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Class Relations.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Class Relations"
+            }
+          },
+          {
+            "id": "4908c174e988313c",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "obsidian-kanban:Create new board": false,
+      "obsidian-git:Open Git source control": false
+    }
+  },
+  "active": "1c06cb9f28fae991",
+  "lastOpenFiles": [
+    "Personal/Internet Addiction.md",
+    "Personal/Day 1.md",
+    "Personal/-- Index.md",
+    "Personal",
+    "0-100/Untitled.canvas",
+    "0-100/Untitled 1.canvas",
+    "0-100/Typescript.md",
+    "0-100/Styling and Tailwind.md",
+    "0-100/Serverless Architecture.md",
+    "0-100/SQL Backend.md",
+    "0-100/Recoil.md",
+    "0-100/React.md",
+    "0-100/Prisma ORM.md",
+    "0-100/Pasted image 20240727004611.png",
+    "0-100/Pasted image 20240726185858.png",
+    "0-100/Pasted image 20240721104120.png",
+    "0-100/Pasted image 20240714204921.png",
+    "0-100/Pasted image 20240714083022.png",
+    "0-100/Pasted image 20240624194533.png",
+    "0-100/Pasted image 20240622212025.png",
+    "0-100/Pasted image 20240622170607.png",
+    "0-100/Pasted image 20240622170301.png",
+    "0-100/Pasted image 20240622170103.png",
+    "0-100/MonoRepos.md",
+    "0-100/Git.md",
+    "0-100/Frontend.md",
+    "0-100/Express and Backend.md",
+    "0-100/Database.md",
+    "0-100/DOM.md",
+    "0-100/Bash and Terminals.md",
+    "0-100/Advanced TS.md",
+    "0-100/AWS - frontend deployment.md",
+    "0-100/AWS - backends.md",
+    "0-100/-- Cohort 0-100.md",
+    "0-100",
+    "Obsidian/Personal/Internet Addiction.md",
+    "Obsidian/Personal/Day 1.md",
+    "Obsidian/Personal/-- Index.md",
+    "Obsidian/Personal",
+    "Obsidian/0-100/Untitled.canvas",
+    "Obsidian/0-100/Untitled 1.canvas",
+    "Obsidian/0-100/Typescript.md",
+    "Obsidian/0-100/Styling and Tailwind.md",
+    "Obsidian/0-100",
+    "Obsidian",
+    "Untitled.base",
+    "LLD"
+  ]
+}
