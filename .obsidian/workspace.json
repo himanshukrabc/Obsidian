@@ -20,23 +20,8 @@
               "icon": "lucide-file",
               "title": "OOPs"
             }
-          },
-          {
-            "id": "1c06cb9f28fae991",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Class Relations.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Class Relations"
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -109,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Class Relations.md",
+                "file": "OOPs.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Class Relations"
+              "title": "Backlinks for OOPs"
             }
           },
           {
@@ -128,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Class Relations.md",
+                "file": "OOPs.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Class Relations"
+              "title": "Outgoing links from OOPs"
             }
           },
           {
@@ -157,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Class Relations.md",
+                "file": "OOPs.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Class Relations"
+              "title": "Outline of OOPs"
             }
           },
           {
@@ -196,8 +181,10 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "1c06cb9f28fae991",
+  "active": "bb2f50a695ec32ac",
   "lastOpenFiles": [
+    "Untitled Kanban.md",
+    "Class Relations.md",
     "Personal/Internet Addiction.md",
     "Personal/Day 1.md",
     "Personal/-- Index.md",
@@ -239,8 +226,6 @@
     "Obsidian/Personal",
     "Obsidian/0-100/Untitled.canvas",
     "Obsidian/0-100/Untitled 1.canvas",
-    "Obsidian/0-100/Typescript.md",
-    "Obsidian/0-100/Styling and Tailwind.md",
     "Obsidian/0-100",
     "Obsidian",
     "Untitled.base",
