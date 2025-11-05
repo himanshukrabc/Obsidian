@@ -11,14 +11,12 @@
             "id": "bb2f50a695ec32ac",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "pdf",
               "state": {
-                "file": "OOPs.md",
-                "mode": "source",
-                "source": false
+                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf"
               },
-              "icon": "lucide-file",
-              "title": "OOPs"
+              "icon": "lucide-file-text",
+              "title": "Operating Systems - Three Easy Pieces"
             }
           }
         ]
@@ -94,7 +92,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "OOPs.md",
+                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for OOPs"
+              "title": "Backlinks for Operating Systems - Three Easy Pieces"
             }
           },
           {
@@ -113,12 +111,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "OOPs.md",
+                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from OOPs"
+              "title": "Outgoing links from Operating Systems - Three Easy Pieces"
             }
           },
           {
@@ -142,13 +140,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "OOPs.md",
+                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of OOPs"
+              "title": "Outline of Operating Systems - Three Easy Pieces"
             }
           },
           {
@@ -181,8 +179,9 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "2f39623344cf8bb7",
+  "active": "bb2f50a695ec32ac",
   "lastOpenFiles": [
+    "OOPs.md",
     "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
     "Operating Systems",
     "Untitled Kanban.md",
@@ -223,7 +222,6 @@
     "0-100/-- Cohort 0-100.md",
     "0-100",
     "Obsidian/Personal/Internet Addiction.md",
-    "Obsidian/Personal/Day 1.md",
     "Obsidian/Personal",
     "Obsidian/0-100/Untitled.canvas",
     "Obsidian/0-100/Untitled 1.canvas",
