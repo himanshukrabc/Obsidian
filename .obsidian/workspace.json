@@ -4,19 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "6aa72e0b6a953450",
+        "id": "47c7c8fd0ef45087",
         "type": "tabs",
         "children": [
           {
-            "id": "bb2f50a695ec32ac",
+            "id": "b63f48616f39edc2",
             "type": "leaf",
             "state": {
-              "type": "pdf",
+              "type": "markdown",
               "state": {
-                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf"
+                "file": "Operating Systems/Virtualisation.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-file-text",
-              "title": "Operating Systems - Three Easy Pieces"
+              "icon": "lucide-file",
+              "title": "Virtualisation"
             }
           }
         ]
@@ -92,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
+                "file": "Operating Systems/Virtualization.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Operating Systems - Three Easy Pieces"
+              "title": "Backlinks for Virtualization"
             }
           },
           {
@@ -111,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
+                "file": "Operating Systems/Virtualization.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Operating Systems - Three Easy Pieces"
+              "title": "Outgoing links from Virtualization"
             }
           },
           {
@@ -140,17 +142,17 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
+                "file": "Operating Systems/Virtualization.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Operating Systems - Three Easy Pieces"
+              "title": "Outline of Virtualization"
             }
           },
           {
-            "id": "4908c174e988313c",
+            "id": "d19573f9ab51cdef",
             "type": "leaf",
             "state": {
               "type": "git-view",
@@ -164,7 +166,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -179,10 +181,14 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "bb2f50a695ec32ac",
+  "active": "b63f48616f39edc2",
   "lastOpenFiles": [
-    "OOPs.md",
+    "Image",
+    "Image/Screenshot 2025-11-15 at 4.49.06 PM.png",
+    "Operating Systems/Operating Systems - Three Easy Pieces.pdf.sb-046539b0-KBqydr",
+    "Operating Systems/Virtualisation.md",
     "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
+    "OOPs.md",
     "Operating Systems",
     "Untitled Kanban.md",
     "Class Relations.md",
@@ -208,7 +214,6 @@
     "0-100/Pasted image 20240622212025.png",
     "0-100/Pasted image 20240622170607.png",
     "0-100/Pasted image 20240622170301.png",
-    "0-100/Pasted image 20240622170103.png",
     "0-100/MonoRepos.md",
     "0-100/Git.md",
     "0-100/Frontend.md",
@@ -221,7 +226,6 @@
     "0-100/AWS - backends.md",
     "0-100/-- Cohort 0-100.md",
     "0-100",
-    "Obsidian/Personal/Internet Addiction.md",
     "Obsidian/Personal",
     "Obsidian/0-100/Untitled.canvas",
     "Obsidian/0-100/Untitled 1.canvas",

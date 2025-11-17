@@ -1,1 +1,9 @@
-{}
+{
+  "cssTheme": "SpectrumPlus",
+  "textFontFamily": "Arial",
+  "baseFontSize": 16,
+  "baseFontSizeAction": false,
+  "translucency": true,
+  "interfaceFontFamily": "Arial",
+  "monospaceFontFamily": "Arial"
+}
