@@ -33,13 +33,16 @@ if (rc < 0) { // fork failed; exit
 ##### exec()
 - It is used to start up a new process. It loads the code up from an executable and takes in the arguments to pass to the new process.
 - Then it overwrites the current process to run the new process.
-###### To start a new process, a prev process has to run fork() and then exec() this separation allows the calling program to execute certain instructions before start of new process if required.
+###### To start a new process, a prev process has to run fork() and then exec() this separation allows the calling program to alter environment of the to be run process.
+###### Shell
+Shell basically waits for you to give some input. It then runs a fork command and based on your input, runs an exec() on the child. The parent calls the wait() to display the exit status of the child process.
+
 #### Trap Handler
 - Whenever a system call is triggered, a **trap** instruction is called. The hardware handles control to the trap Handler. 
 - This trap handler is responsible for interpreting what kind of instructions the OS has to execute in response to that system call.
 - When the OS is done a **return-from-trap** instruction is called.
 # Virtualising the CPU
-##### Process
+#### Process
 - Any running program is called a **process**.
 - When a process runs it has - 
   **code** - The code written by user in executable format is loaded up in the memory. 
@@ -50,12 +53,6 @@ if (rc < 0) { // fork failed; exit
 	- instruction pointer - The instrcution the process is currently executing.
 	- Stack and Heap pointer - location of the stack and the heap.
 	- File discriptors - Where to read, write output and errors.
-##### Time Sharing
-- OS can preemptly stop a process and make another process run. This leads to multiple processes sharing the CPU. This is called Time Sharing.
-##### Context Switching
-- Whenever a process is preempted, all data(registers etc) related to it has to be moved out of the memory and stored elsewhere.
-- The data of the to-be-run process has to copied in. This is called context switching. 
-- It is a costly process for the CPU to perform.
 #### Process States
 - **Running**: Process is running on a processor.
 - **Ready**: Process is ready to run but for some the OS has chosen not to run it at this given moment.
@@ -64,3 +61,11 @@ if (rc < 0) { // fork failed; exit
 ##### Zombie Process
 - When a child process finishes, it becomes a zombie process until the parent process reads its exit status by calling wait().
 - If the parent exits without calling wait(), It is adopted by the init process(Parent of all processes).
+##### Time Sharing
+- OS can preemptly stop a process and make another process run. This leads to multiple processes sharing the CPU. This is called Time Sharing.
+##### Context Switching
+- Whenever a process is preempted, all data(registers etc) related to it has to be moved out of the memory and stored elsewhere.
+- The data of the to-be-run process has to copied in. This is called context switching. 
+- It is a costly process for the CPU to perform.
+### Methods of Virtualisaiton
+#### Limited Direct Execution
