@@ -342,3 +342,104 @@ else // TLB Miss
 - It allocates just enough memory to accommodate the process's memory requirements.
 ###### Cons - 
 - TLB miss would be costlier as it would require 2 new memory accesses.
+###### Example -
+- 16KB(14bit) - Address Space, 64byte(6bit) - pages. => VPN = 8bit.
+- Code -page 0,1; Heap -page 4,5; Stack -page 254,255
+- Assuming each page table entry to be 4bytes, page table will be 256x4 bytes = 16pages. Each page will contain 16 PTEs
+- Thus PDE will have 2 entries -> contianing pages for table 0,1,3,4 and 254,255
+```C++
+	PTEAddr = (PDE.PFN << SHIFT) + (PTIndex * sizeof(PTE))
+```
+- Lot of space is saved as 2 pages are only allocated for Page Table and Page Directory will take up 1 page.![[Screenshot 2025-11-22 at 12.22.11 PM.png|550]]
+
+```C++
+VPN = (VirtualAddress & VPN_MASK) >> SHIFT
+
+(Success, TlbEntry) = TLB_Lookup(VPN)
+if (Success == True) // TLB Hit
+    if (CanAccess(TlbEntry.ProtectBits) == True)
+        Offset = VirtualAddress & OFFSET_MASK
+        PhysAddr = (TlbEntry.PFN << SHIFT) | Offset
+        Register = AccessMemory(PhysAddr)
+    else
+        RaiseException(PROTECTION_FAULT)
+else // TLB Miss
+    // first, get page directory entry
+    PDIndex = (VPN & PD_MASK) >> PD_SHIFT
+    PDEAddr = PDBR + (PDIndex * sizeof(PDE))
+    PDE = AccessMemory(PDEAddr)
+    if (PDE.Valid == False)
+        RaiseException(SEGMENTATION_FAULT)
+    else
+        // PDE is valid: now fetch PTE from page table
+        PTIndex = (VPN & PT_MASK) >> PT_SHIFT
+        PTEAddr = (PDE.PFN << SHIFT) + (PTIndex * sizeof(PTE))
+        PTE = AccessMemory(PTEAddr)
+        if (PTE.Valid == False)
+            RaiseException(SEGMENTATION_FAULT)
+        else if (CanAccess(PTE.ProtectBits) == False)
+            RaiseException(PROTECTION_FAULT)
+        else
+            TLB_Insert(VPN, PTE.PFN, PTE.ProtectBits)
+            RetryInstruction()
+```
+- From PDE_Mask & PDE_Shift, get the PDE Index. Then to get PDE, PDBR + PDE_Index\*Size(PDE)
+  From PDE get the PFN of the page that contains the page table portion. Now get PT_Index from PTE_Mask and PTE_Shift.
+  Get PTE from (PDE.PFN)<<SHIFT + PT_Index\*Size(PTE). From PTE -> PTE.PFN << SHIFT + Offset.
+##### Inverted Page Tables
+- Instead of having per page page table, we maintain a page table indicating which process's which virtual page is mapped to this physical page.
+### Swapping
+- It would be wise for OS to support large address space as the programmer would not have to think about memory when coding.
+- Instead of storing all the pages in memory, swap out few pages into the disk in a **swap space**.
+- All code pages are loaded as required.
+##### Present Bit
+- Indicates whether the page is in memory or has been swapped into the swap space.
+- If present bit =0, then the OS would look store the disk page address in the PTE so that it can swap the page in. This is called **pagee fault**
+##### Page Fault
+- If a page needs to be accessed that is not in memory, a **page fault** occurs.
+- The control transfers to a Page Fault Handler. It is responsible to swap the required page in form memory.
+- During this time the process is blocked and the OS can run other processes.
+##### Page/Swap Daemon
+- It is a process running to keep the memory space free.
+- If the number of pages exceed **High Watermark(HW)** it swaps pages out to the swap space. If it is lower than **Low Watermark(LW)** it swaps pages in.
+- Which pages to swap in is decided by swapping policies. Thus the memory is essentially a cache, storing the frequently accessed pages.
+#### Cache Management and Replacement Policies
+- Avg. Memory Access Time (AMAT) = P<sub>Hit</sub>\*T<sub>M</sub> + P<sub>Miss</sub>\*T<sub>D</sub>
+- The most optimal approach is to replace the page which will be used furthest in the future. But it is difficult to implement.
+- Types of cache misses -
+	- **Cold Start/Compulsory Miss** - when cache is empty
+	- **Capacity Miss** - when cache is full
+	- **Conflict Miss** - When cache is empty but the section used incoming item is full. Occurs in cases where cache entries are non associative.
+##### FIFO
+- Pages are placed in a queue and the first page in queue will be removed when space is required.
+- Does not have **Stack Property** - If cache size increases, efficiency might decrease.
+##### Random
+- Pages removed at random. Performs better than FIFO.
+##### History Based
+###### Least Recently Used(LRU)
+- Takes into account the history of the entry and evicts the Least Recently Used entry.
+###### Least Frequently Used(LFU)
+- Evicts the page which is least frequently used.
+##### Testing under different workloads
+- **Random Workload**- Pages are referenced at random. All policies perform identically.
+- **80-20 Workload** - 80% calls to 20% pages. LRU performs much better than others.
+- **Looping Workload** - Pages are referenced 1-n then from 1 again. All policies perform badly except Random.
+- Since 80-20 is the workload generally observed. LRU is best.
+##### Implementing LRU
+- If we implement LRU, it is very costly and demanding. You need to update a data structure everytime a page is accessed and move the page entry to the top(Most recently used side).
+- If we use hardware support and for each page maintain when the page was last referenced, OS just needs to scan and find the one with the earliest entry. But this requires traversal through the entire set of pages and is costly.
+###### Approximating LRU - Use bit
+- You set use bit to 1 to all the pages and implement an clock algo
+- Set the pointer to any one of the pages. If the current page has use bit = 0, swap it. Else set use bit to 0 and move to the next page.
+###### Dirty Bit
+- It is easier to replace places which have not been written to/modified as they dont require copying data.
+- So some algos consider dirty bit while swapping pages
+#### Page Selection
+- Which page to swap into memory. Most OS just use demand paging and swap in pages when their demand arises.
+#### Writing to Disk
+- Another policy is to determine when to write out to disk. 
+- It is better to cluster all the writes onto disks and execute them together. This is called **grouping/clustering of writes**
+#### Thrashing
+- Sometimes while running memory intensive processes the memory may fall short and OS will be **busy paging constantly**.
+- To prevent this some OS may decide not to run a subset of processes and execute others. This is called **admission control**.
+- Other OS may choose to kill some memory intensive process as in Linux.
