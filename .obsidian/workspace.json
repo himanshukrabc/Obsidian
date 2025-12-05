@@ -13,21 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Operating Systems/Virtualisation.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Virtualisation"
-            }
-          },
-          {
-            "id": "40b1464db00d34d0",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Concurrency.md",
+                "file": "Operating Systems/Concurrency.md",
                 "mode": "source",
                 "source": false
               },
@@ -35,8 +21,7 @@
               "title": "Concurrency"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -196,11 +181,13 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "40b1464db00d34d0",
+  "active": "b63f48616f39edc2",
   "lastOpenFiles": [
-    "Operating Systems/Operating Systems - Three Easy Pieces.pdf.sb-9e608068-Y6N9zZ",
+    "Operating Systems/Operating Systems - Three Easy Pieces.pdf.sb-85ffd499-SRS6Vb",
+    "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
     "Operating Systems/Virtualisation.md",
-    "Concurrency.md",
+    "Operating Systems/Concurrency.md",
+    "Operating Systems/Operating Systems - Three Easy Pieces.pdf.sb-9e608068-Y6N9zZ",
     "Operating Systems/Operating Systems - Three Easy Pieces.pdf.sb-046539b0-KBqydr",
     "Screenshot 2025-11-22 at 12.22.11 PM.png",
     "Image/Pasted image 20251119095854.png",
@@ -209,7 +196,6 @@
     "Image/Screenshot 2025-11-20 at 9.45.35 AM.png",
     "Image",
     "Image/Screenshot 2025-11-15 at 4.49.06 PM.png",
-    "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
     "OOPs.md",
     "Operating Systems",
     "Untitled Kanban.md",
@@ -246,7 +232,6 @@
     "Obsidian/0-100/Untitled.canvas",
     "Obsidian/0-100/Untitled 1.canvas",
     "Obsidian/0-100",
-    "Obsidian",
-    "Untitled.base"
+    "Obsidian"
   ]
 }
