@@ -1,0 +1,10 @@
+[[BOSS]]
+[[Docker]]
+[[Kubernetes]]
+[[Java]]
+[[Microservices]]
+[[PL SQL]]
+[[IIT D OS]]
+  
+[[DBMS]]
+[[Operating System]]
