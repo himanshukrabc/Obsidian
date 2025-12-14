@@ -13,15 +13,30 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "HLD/System Design.md",
+                "file": "LLD/Index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "System Design"
+              "title": "Index"
+            }
+          },
+          {
+            "id": "ece58f15574754f9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "LLD/SOLID Principles.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "SOLID Principles"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -182,13 +197,30 @@
       "obsidian-importer:Open Importer": false
     }
   },
-  "active": "b63f48616f39edc2",
+  "active": "2f39623344cf8bb7",
   "lastOpenFiles": [
-    "Pasted image 20251206143751.png",
+    "LLD/SOLID Principles.md",
+    "LLD/Index.md",
+    "LLD/Class Relationships.md",
+    "LLD/Design Principles.md",
+    "Class Relations.md",
     "Pasted image 20251206143654.png",
-    "Screenshot 2025-12-06 at 2.22.12 PM.png",
-    "Screenshot 2025-12-06 at 2.21.11 PM.png",
-    "Image/Pasted image 20251206141431.png",
+    "Image/Pasted image 20251206143654.png",
+    "Image/Pasted image 20251206143751.png",
+    "Image/Screenshot 2025-12-08 at 6.54.04 PM.png",
+    "Image/Screenshot 2025-12-07 at 7.11.48 PM.png",
+    "Image/Screenshot 2025-12-07 at 7.30.30 PM.png",
+    "Image/Screenshot 2025-12-07 at 7.11.02 PM.png",
+    "Image/Screenshot 2025-12-07 at 7.09.16 PM.png",
+    "Image/Screenshot 2025-12-07 at 6.56.52 PM.png",
+    "Image/Screenshot 2025-12-06 at 2.21.11 PM.png",
+    "LLD",
+    "OOPS_LLD/OOPs.md",
+    "Operating Systems/Virtualisation.md",
+    "Operating Systems/Persistence.md",
+    "Operating Systems/Concurrency.md",
+    "DBMS/DBMS.md",
+    "HLD/System Design.md",
     "Notebook/BOSS.md",
     "Notebook/Docker.md",
     "Notebook/ESG Reporting.md",
@@ -198,38 +230,21 @@
     "Notebook/PL SQL.md",
     "Notebook/Operating System.md",
     "Notebook/Microservices.md",
-    "HLD/System Design.md",
     "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared/People.md",
     "Notion/4455e7b0222e487f901e1508103725c0/Untitled.md",
-    "DBMS/DBMS.md",
     "DBMS/SQL.md",
     "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared/Life Plans.md",
     "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared/People/Himanshu Kumar.md",
     "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared/People/General Code.md",
-    "Personal/Internet Addiction.md",
-    "Personal/Day 1.md",
-    "Personal/-- Index.md",
     "Personal",
-    "1.png",
-    "Image/Untitled.png",
-    "Image/Untitled.jpeg",
-    "Image/Untitled 16.png",
-    "Image/Untitled 15.png",
-    "Image/Untitled 14.png",
-    "Image/Personal/Internet Addiction.md",
-    "Image/Personal/Day 1.md",
-    "Image/Personal/-- Index.md",
     "Image/Personal",
     "Image/12.pdf",
     "12.pdf",
-    "Notebook/Java.md",
     "DBMS",
     "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared/People",
     "Notebook",
     "Notion/4455e7b0222e487f901e1508103725c0",
     "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared",
-    "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f",
-    "OOPs.md",
     "0-100/Untitled.canvas",
     "0-100/Untitled 1.canvas",
     "Obsidian/0-100/Untitled.canvas",
