@@ -55,14 +55,6 @@
   "workspace:goto-tab-6": [],
   "workspace:goto-tab-7": [],
   "workspace:goto-tab-8": [],
-  "editor:toggle-code": [
-    {
-      "modifiers": [
-        "Ctrl"
-      ],
-      "key": "`"
-    }
-  ],
   "editor:toggle-highlight": [
     {
       "modifiers": [
@@ -70,6 +62,14 @@
         "Shift"
       ],
       "key": "="
+    }
+  ],
+  "editor:insert-codeblock": [
+    {
+      "modifiers": [
+        "Ctrl"
+      ],
+      "key": "`"
     }
   ]
 }

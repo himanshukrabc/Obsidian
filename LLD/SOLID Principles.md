@@ -335,3 +335,260 @@ class DocumentProcessor {
 	  For example:
 		- Making a **mutable** property in the base class **immutable** in the subclass (or vice versa) can lead to subtle bugs.
 		- Changing validation logic in ways that break existing assumptions in client code is another LSP violation.
+## Interface Segregation Principle
+- **Keep your interfaces focused**. Each interface should represent a specific capability or behavior.
+- Essentially the LSP of interfaces.
+```Java
+interface MediaPlayer {
+    void playAudio(String audioFile);
+    void stopAudio();
+    void adjustAudioVolume(int volume);
+
+    void playVideo(String videoFile);
+    void stopVideo();                
+    void adjustVideoBrightness(int brightness);
+    void displaySubtitles(String subtitleFile);
+}
+class AudioOnlyPlayer implements MediaPlayer {
+    @Override
+    public void playAudio(String audioFile) {
+        System.out.println("Playing audio file: " + audioFile);
+    }
+    @Override
+    public void stopAudio() {
+        System.out.println("Audio stopped.");
+    }
+    @Override
+    public void adjustAudioVolume(int volume) {
+        System.out.println("Audio volume set to: " + volume);
+    }
+    // 👎 Methods this class shouldn't care about:
+    @Override
+    public void playVideo(String videoFile) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+    @Override
+    public void stopVideo() { /* no-op */ }
+    @Override
+    public void adjustVideoBrightness(int brightness) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+    @Override
+    public void displaySubtitles(String subtitleFile) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+}
+````
+- As you can see the Audio Player class does not require all the methods defined by the interface.
+- Issues - 
+  - *Interface Pollution*
+  - *Fragile Code* - Suppose you want to add an extra functionality(Picture-in-picture()), all classes have to be changed.
+### Applying ISP
+#### Split the Interface
+```Java
+// Audio-only capabilities
+interface AudioPlayerControls {
+    void playAudio(String audioFile);
+    void stopAudio();
+    void adjustAudioVolume(int volume);
+}
+
+// Video-only capabilities
+interface VideoPlayerControls {
+    void playVideo(String videoFile);
+    void stopVideo();
+    void adjustVideoBrightness(int brightness);
+    void displaySubtitles(String subtitleFile);
+}
+```
+#### Provide classes only interfaces they need
+```Java
+class ModernAudioPlayer implements AudioPlayerControls {
+    @Override
+    public void playAudio(String audioFile) {
+        System.out.println("ModernAudioPlayer: Playing audio - " + audioFile);
+    }
+    @Override
+    public void stopAudio() {
+        System.out.println("ModernAudioPlayer: Audio stopped.");
+    }
+    @Override
+    public void adjustAudioVolume(int volume) {
+        System.out.println("ModernAudioPlayer: Volume set to " + volume);
+    }
+}
+class SilentVideoPlayer implements VideoPlayerControls {
+    @Override
+    public void playVideo(String videoFile) {
+        System.out.println("SilentVideoPlayer: Playing video - " + videoFile);
+    }
+    @Override
+    public void stopVideo() {
+        System.out.println("SilentVideoPlayer: Video stopped.");
+    }
+    @Override
+    public void adjustVideoBrightness(int brightness) {
+        System.out.println("SilentVideoPlayer: Brightness set to " + brightness);
+    }
+    @Override
+    public void displaySubtitles(String subtitleFile) {
+        System.out.println("SilentVideoPlayer: Subtitles from " + subtitleFile);
+    }
+}
+class ComprehensiveMediaPlayer implements AudioPlayerControls, VideoPlayerControls {
+    @Override
+    public void playAudio(String audioFile) {
+        System.out.println("ComprehensiveMediaPlayer: Playing audio - " + audioFile);
+    }
+    @Override
+    public void stopAudio() {
+        System.out.println("ComprehensiveMediaPlayer: Audio stopped.");
+    }
+    @Override
+    public void adjustAudioVolume(int volume) {
+        System.out.println("ComprehensiveMediaPlayer: Audio volume set to " + volume);
+    }
+    @Override
+    public void playVideo(String videoFile) {
+        System.out.println("ComprehensiveMediaPlayer: Playing video - " + videoFile);
+    }
+    @Override
+    public void stopVideo() {
+        System.out.println("ComprehensiveMediaPlayer: Video stopped.");
+    }
+    @Override
+    public void adjustVideoBrightness(int brightness) {
+        System.out.println("ComprehensiveMediaPlayer: Brightness set to " + brightness);
+    }
+    @Override
+    public void displaySubtitles(String subtitleFile) {
+        System.out.println("ComprehensiveMediaPlayer: Subtitles from " + subtitleFile);
+    }
+}
+```
+### Advantages of ISP
+- **Increased Cohesion, Reduced Coupling** - Splitting responsibilities of interface increases cohesion and reduces coupling.
+- **Improved Flexibility & Reusability** - Lesser responsibilities -> more reusability
+- **Better Code Readability & Maintainability**
+- **Enhanced Testability**
+- **Avoids "Interface Pollution" and LSP Violations**
+### Pitfalls of ISP
+- **Over-Segregation** - Loads of classes.
+- **Not Thinking from the Client’s Perspective** - Designing interfaces based only on how implementers work — not how clients use them.
+- **Lack of Cohesion** - Over splitting can lead to this.
+## Dependency Inversion Principle
+- *High level modules should not depend on low level modules.* -> Inverted dependency.
+- *Abstractions should not depend on details of the implementation. Implementation must depend on abstraction.*
+- **There should be an interface/abstraction on which both High level and low level modules depend**
+```Java
+class GmailClient {
+    public void sendGmail(String toAddress, String subjectLine, String emailBody) {
+        System.out.println("Connecting to Gmail SMTP server...");
+        System.out.println("Sending email via Gmail to: " + toAddress);
+        System.out.println("Subject: " + subjectLine);
+        System.out.println("Body: " + emailBody);
+        // ... actual Gmail API interaction logic ...
+        System.out.println("Gmail email sent successfully!");
+    }
+}
+class EmailService {
+    private GmailClient gmailClient;
+    public EmailService() {
+        this.gmailClient = new GmailClient();
+    }
+    public void sendWelcomeEmail(String userEmail, String userName) {
+        String subject = "Welcome, " + userName + "!";
+        String body = "Thanks for signing up to our awesome platform. We're glad to have you!";
+        this.gmailClient.sendGmail(userEmail, subject, body);
+    }
+    public void sendPasswordResetEmail(String userEmail) {
+        String subject = "Reset Your Password";
+        String body = "Please click the link below to reset your password...";
+        this.gmailClient.sendGmail(userEmail, subject, body);
+    }
+}
+```
+- Here the High level module(EmailService) depends on low level module(GmailClient).
+### Applying DIP
+#### Define the Abstraction
+```Java
+interface EmailClient {
+    void sendEmail(String to, String subject, String body);
+}
+```
+#### Concrete Implementations
+```Java
+class GmailClientImpl implements EmailClient {
+    @Override
+    public void sendEmail(String to, String subject, String body) {
+        System.out.println("Connecting to Gmail SMTP server...");
+        System.out.println("Sending email via Gmail to: " + to);
+        System.out.println("Subject: " + subject);
+        System.out.println("Body: " + body);
+        // ... actual Gmail API interaction logic ...
+        System.out.println("Gmail email sent successfully!");
+    }
+}
+class OutlookClientImpl implements EmailClient {
+    @Override
+    public void sendEmail(String to, String subject, String body) {
+        System.out.println("Connecting to Outlook Exchange server...");
+        System.out.println("Sending email via Outlook to: " + to);
+        System.out.println("Subject: " + subject);
+        System.out.println("Body: " + body);
+        // ... actual Outlook API interaction logic ...
+        System.out.println("Outlook email sent successfully!");
+    }
+}
+```
+#### Update the High-Level Module
+```java
+class EmailService {
+    private final EmailClient emailClient; // Depends on the INTERFACE!
+
+    // Dependency is "injected" via the constructor
+    public NewEmailService(EmailClient emailClient) {
+        this.emailClient = emailClient;
+    }
+
+    public void sendWelcomeEmail(String userEmail, String userName) {
+        String subject = "Welcome, " + userName + "!";
+        String body = "Thanks for signing up to our awesome platform. We're glad to have you!";
+        this.emailClient.sendEmail(userEmail, subject, body); // Calls the interface method
+    }
+
+    public void sendPasswordResetEmail(String userEmail) {
+        String subject = "Your Password Reset Request";
+        String body = "Please click the link below to reset your password...";
+        this.emailClient.sendEmail(userEmail, subject, body);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("--- Using Gmail ---");
+        EmailService gmailService = new EmailService(new GmailClientImpl());
+        gmailService.sendEmail("test@example.com", "Welcome to SOLID principles!");
+
+        System.out.println("--- Using Outlook ---");
+        EmailService outlookService = new EmailService(new OutlookClientImpl());
+        outlookService.sendEmail("test@example.com", "Welcome to SOLID principles!");
+    }
+}
+```
+### Advantages of DIP
+- **Decoupling** - High-level modules become independent of the nitty-gritty details of low-level modules.
+- **Flexibility & Extensibility** - High level modules become extensible to all classes that implement the abstraction.
+- **Enhanced Testability** - Swap out dependencies with mocks
+- **Improved Maintainability** - Changes in one class will not break others.
+- **Parallel Development** - Development can be carried out on all low level modules simultaneously once abstraction is implemented
+### Pitfalls of DIP
+- **Over-Abstraction** - Creating interfaces for everything.
+  **When to use interfaces:**
+	- For external dependencies (APIs, email providers, databases)
+	- For components that might change
+	- For parts you need to mock in tests
+- **Leaky Abstractions** - Exposing implementation-specific logic in your interface.
+  - example you add a method that gives implementation specific(low level) details.
+- **Interfaces Owned by Low-Level Modules** - 
+- **No Actual Injection** - Dependency Injection is a must for this.
