@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "LLD/Structural Patterns.md",
+                "file": "LLD/Behavioural Patterns.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Structural Patterns"
+              "title": "Behavioural Patterns"
             }
           }
         ],
@@ -199,7 +199,14 @@
   },
   "active": "7be4a23cdbe5c707",
   "lastOpenFiles": [
+    "Screenshot 2026-01-05 at 11.29.44 PM.png",
     "LLD/Index.md",
+    "LLD/Additional Patterns.md",
+    "LLD/Structural Patterns.md",
+    "Screenshot 2026-01-05 at 9.29.53 PM.png",
+    "Screenshot 2026-01-04 at 3.47.34 PM.png",
+    "Screenshot 2026-01-03 at 4.49.01 PM.png",
+    "Screenshot 2026-01-02 at 11.24.05 PM.png",
     "LLD/Creational Patterns.md",
     "Screenshot 2026-01-01 at 5.21.03 PM.png",
     "Screenshot 2026-01-01 at 4.32.55 PM.png",
@@ -207,17 +214,11 @@
     "Screenshot 2025-12-25 at 2.35.40 PM.png",
     "Screenshot 2025-12-25 at 5.49.30 AM.png",
     "Additional Patterns.md",
-    "LLD/Structural Patterns.md",
     "LLD/Behavioural Patterns.md",
-    "LLD/Additional Patterns.md",
     "Behavioural Patterns.md",
     "Structural Patterns.md",
     "Creational Patterns.md",
     "Gemini_Generated_Image_ljnhsdljnhsdljnh.png",
-    "Image/Screenshot 2025-12-23 at 6.07.54 PM.png",
-    "Image/Screenshot 2025-12-23 at 6.07.12 PM.png",
-    "Image/Screenshot 2025-12-23 at 7.30.26 PM.png",
-    "Image/Screenshot 2025-12-23 at 7.29.22 PM.png",
     "LLD/UML.md",
     "LLD/SOLID Principles.md",
     "LLD/Design Principles.md",
