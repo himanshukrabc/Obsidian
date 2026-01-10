@@ -953,3 +953,589 @@ public class ReportAppTemplateMethod {
 - **Improved maintainability** — common logic changes only in one place.
 - **Reduced risk of errors** — the order of steps is controlled and protected by the abstract base class.
 # Visitor
+- lets you **add new operations to existing object structures** without modifying their classes.
+- The **Visitor Pattern** lets you **externalize operations** into separate visitor classes. 
+- Each visitor implements behavior for every element type, while the elements simply accept the visitor.
+## Example - Shapes
+```Java
+interface Shape {
+    void draw();
+    double calculateArea();
+    String exportAsSvg();
+    String toJson();
+}
+class Circle implements Shape {
+    private double radius;
+    public Circle(double radius) {
+        this.radius = radius;
+    }
+    public void draw() {
+        System.out.println("Drawing a circle");
+    }
+    public double calculateArea() {
+        return Math.PI * radius * radius;
+    }
+    public String exportAsSvg() {
+        return "<circle r=\"" + radius + "\" />";
+    }
+    public String toJson() {
+        return "{ \"type\": \"circle\", \"radius\": " + radius + " }";
+    }
+}
+```
+## Problems
+- **Violates SRP**
+- **Hard to Extend** - Adding any new method will modify each class.
+- **You Don’t Always Control the Classes** - If you dont own the classes you cant add new behaviour to it.
+## Implementing Visitor Pattern
+```Java
+interface Shape {
+    void accept(ShapeVisitor visitor);
+}
+class Circle implements Shape {
+    private final double radius;
+    public Circle(double radius) {
+        this.radius = radius;
+    }
+    public double getRadius() {
+        return radius;
+    }
+    @Override
+    public void accept(ShapeVisitor visitor) {
+        visitor.visitCircle(this);
+    }
+}
+class Rectangle implements Shape {
+    private final double width;
+    private final double height;
+    public Rectangle(double width, double height) {
+        this.width = width;
+        this.height = height;
+    }
+    public double getWidth() {
+        return width;
+    }
+    public double getHeight() {
+        return height;
+    }
+    @Override
+    public void accept(ShapeVisitor visitor) {
+        visitor.visitRectangle(this);
+    }
+}
+interface ShapeVisitor {
+    void visitCircle(Circle circle);
+    void visitRectangle(Rectangle rectangle);
+}
+class AreaCalculatorVisitor implements ShapeVisitor {
+    @Override
+    public void visitCircle(Circle circle) {
+        double area = Math.PI * circle.getRadius() * circle.getRadius();
+        System.out.println("Area of Circle: " + area);
+    }
+    @Override
+    public void visitRectangle(Rectangle rectangle) {
+        double area = rectangle.getWidth() * rectangle.getHeight();
+        System.out.println("Area of Rectangle: " + area);
+    }
+}
+class SvgExporterVisitor implements ShapeVisitor {
+    @Override
+    public void visitCircle(Circle circle) {
+        System.out.println("<circle r=\"" + circle.getRadius() + "\" />");
+    }
+    @Override
+    public void visitRectangle(Rectangle rectangle) {
+        System.out.println("<rect width=\"" + rectangle.getWidth() + 
+            "\" height=\"" + rectangle.getHeight() + "\" />");
+    }
+}
+public class VisitorPatternDemo {
+    public static void main(String[] args) {
+        List<Shape> shapes = List.of(
+            new Circle(5),
+            new Rectangle(10, 4),
+            new Circle(2.5)
+        );
+        System.out.println("=== Calculating Areas ===");
+        ShapeVisitor areaCalculator = new AreaCalculatorVisitor();
+        for (Shape shape : shapes) {
+            shape.accept(areaCalculator);
+        }
+        System.out.println("\n=== Exporting to SVG ===");
+        ShapeVisitor svgExporter = new SvgExporterVisitor();
+        for (Shape shape : shapes) {
+            shape.accept(svgExporter);
+        }
+    }
+}
+```
+## Benefits
+- **Decoupled logic:** Shape classes are clean; logic lives in visitors
+- **Open/Closed Principle:** Easily add new visitors (e.g., `JsonExporterVisitor`) without touching shapes
+- **Double dispatch:** Eliminated need for `instanceof` or type-checking
+- **Reusability & maintainability:** Each visitor focuses on one operation and is testable in isolation
+## Class Diagram
+![[Screenshot 2026-01-07 at 10.39.21 PM.png|700]]
+# Mediator
+- promotes **loose coupling** by preventing objects from referring to each other directly
+- As more components are added each component ends up handling its own logic plus knowledge of how to coordinate with others.
+- This leads to messed up code which is hard to understand.
+- introducing a **central object that handles communication between components**.
+## Example - UI components
+```Java
+class TextField {
+    private String text = "";
+    private Button loginButton;
+    public void setLoginButton(Button button) {
+        this.loginButton = button;
+    }
+    public void setText(String newText) {
+        this.text = newText;
+        System.out.println("TextField updated: " + text);
+        if (loginButton != null) {
+            loginButton.checkEnabled();
+        }
+    }
+    public String getText() {
+        return text;
+    }
+}
+class Button {
+    private TextField usernameField;
+    private TextField passwordField;
+    private Label statusLabel;
+    public void setDependencies(TextField username, TextField password, Label status) {
+        this.usernameField = username;
+        this.passwordField = password;
+        this.statusLabel = status;
+    }
+    public void checkEnabled() {
+        boolean enable = !usernameField.getText().isEmpty() &&
+            !passwordField.getText().isEmpty();
+        System.out.println("Login Button is now " + (enable ? "ENABLED" : "DISABLED"));
+    }
+    public void click() {
+        if (!usernameField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+            System.out.println("Login successful!");
+            statusLabel.setText("✅ Logged in!");
+        } else {
+            System.out.println("Login failed.");
+            statusLabel.setText("❌ Please enter username and password.");
+        }
+    }
+}
+class Label {
+    public void setText(String message) {
+        System.out.println("Status: " + message);
+    }
+}
+```
+## Problems
+- **Tight Coupling**
+- **Lack of Reusability** - You can’t easily reuse these components elsewhere. They’re hard-wired to interact with specific peers, making them **context-dependent**.
+- **Poor Maintainability** - violates the **Open/Closed Principle**
+- **Hidden Logic Sprawled Across Components**
+## Implementing Mediator
+```Java
+interface UIMediator{
+	void componentChanged(UIComponent component);
+}
+abstract class UIComponent{
+	private UIMediator mediator;
+	void UIComponent(UIMediator mediator){
+		this.mediator = mediator;
+	}
+	public void notifyMediator(){
+		mediator.componentChanged(this);
+	}
+}
+class TextField implements UIComponent{
+	private String text="";
+	public void TextField(Mediator mediator){
+		super(mediator);
+	}
+	public void setText(String text){
+		this.text = text;
+		notifyMediator();
+	}
+	public void getText(){
+		return this.text;
+	}
+}
+class Button implements UIComponent{
+	private boolean enabled = false;
+	public Button(Mediator mediator){
+		super(mediator);
+	}
+	public void click(){
+		if (enabled) {
+            System.out.println("Login Button clicked!");
+            notifyMediator(); // Will trigger login attempt
+        } else {
+            System.out.println("Login Button is disabled.");
+        }
+	}
+	public void setEnabled(boolean value){
+		this.enabled = value;
+	}
+}
+class Label extends UIComponent {
+    private String text;
+    public Label(UIMediator mediator) {
+        super(mediator);
+    }
+    public void setText(String message) {
+        this.text = message;
+        System.out.println("Status: " + text);
+    }
+}
+class FormMediator implements UIMediator{
+	private TextField usernameField;
+	private TextField passwordField;
+	private Button submitButton;
+	private Label statusLabel;
+	public void setUsernameFiels(TextField usernameField){
+		this.usernameField = usernameField;
+	}
+	public void setPasswordField(TextField passwordField) {
+        this.passwordField = passwordField;
+    }
+    public void setLoginButton(Button loginButton) {
+        this.loginButton = loginButton;
+    }
+    public void setStatusLabel(Label statusLabel) {
+        this.statusLabel = statusLabel;
+    }
+	@Override
+    public void componentChanged(UIComponent component) {
+        if (component == usernameField || component == passwordField) {
+            boolean enableButton = !usernameField.getText().isEmpty() && !passwordField.getText().isEmpty();
+            loginButton.setEnabled(enableButton);
+        } else if (component == loginButton) {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            if ("admin".equals(username) && "1234".equals(password)) {
+                statusLabel.setText("✅ Login successful!");
+            } else {
+                statusLabel.setText("❌ Invalid credentials.");
+            }
+        }
+    }
+}
+public class MediatorApp {
+    public static void main(String[] args) {
+        FormMediator mediator = new FormMediator();
+
+        TextField usernameField = new TextField(mediator);
+        TextField passwordField = new TextField(mediator);
+        Button loginButton = new Button(mediator);
+        Label statusLabel = new Label(mediator);
+
+        mediator.setUsernameField(usernameField);
+        mediator.setPasswordField(passwordField);
+        mediator.setLoginButton(loginButton);
+        mediator.setStatusLabel(statusLabel);
+
+        // Simulate user interaction
+        usernameField.setText("admin");
+        passwordField.setText("1234");
+        loginButton.click(); // Should succeed
+
+        System.out.println("\n--- New Attempt with Wrong Password ---");
+        passwordField.setText("wrong");
+        loginButton.click(); // Should fail
+    }
+}
+```
+## Benefits
+- **Loose coupling:** Components no longer know about each other
+- **Separation of concerns:** Coordination logic lives in the mediator, not in the components
+- **Ease of extension:** Add new components or behaviors without modifying existing ones
+- **Reusability:** Components like `TextField`, `Button`, and `Label` can be reused in other contexts
+## Class Diagram
+![[Screenshot 2026-01-07 at 10.54.19 PM.png|700]]
+# Memento
+- lets you **capture and store an object’s internal state** so it can be **restored later**, without violating encapsulation.
+- implement **undo/redo** functionality.
+- support **checkpointing or versioning** of an object’s state.
+- separate the concerns of **state storage** from **state management logic**.
+## Example - Implement Undo in Text Editor
+```Java
+class TextEditorNaive {
+    private String content = "";
+    public void type(String newText) {
+        content += newText;
+    }
+    public void undo(String previousContent) {
+        content = previousContent;
+    }
+    public String getContent() {
+        return content;
+    }
+}
+public class TextEditorUndoV1 {
+    public static void main(String[] args) {
+        TextEditorNaive editor = new TextEditorNaive();
+        editor.type("Hello");
+        String snapshot1 = editor.getContent(); // manual snapshot
+        editor.type(" World");
+        String snapshot2 = editor.getContent();
+        System.out.println("Current Content: " + editor.getContent()); // Hello World
+        // Undo 1 step
+        editor.undo(snapshot1);
+        System.out.println("After Undo: " + editor.getContent()); // Hello
+    }
+}
+```
+## Problems
+- **Encapsulation is Broken**
+- **Manual Snapshot Management**
+- **Not Scalable**
+## Implementing Memento
+```Java
+class TextEditorMemento {
+    private final String state;
+    public TextEditorMemento(String state) {
+        this.state = state;
+    }
+    public String getState() {
+        return state;
+    }
+}
+class TextEditor {
+    private String content = "";
+    public void type(String newText) {
+        content += newText;
+        System.out.println("Typed: " + newText);
+    }
+    public String getContent() {
+        return content;
+    }
+    public TextEditorMemento save() {
+        System.out.println("Saving state: \"" + content + "\"");
+        return new TextEditorMemento(content);
+    }
+    public void restore(TextEditorMemento memento) {
+        content = memento.getState();
+        System.out.println("Restored state to: \"" + content + "\"");
+    }
+}
+class TextEditorUndoManager {
+    private final Stack<TextEditorMemento> history = new Stack<>();
+    public void save(TextEditor editor) {
+        history.push(editor.save());
+    }
+    public void undo(TextEditor editor) {
+        if (!history.isEmpty()) {
+            editor.restore(history.pop());
+        } else {
+            System.out.println("Nothing to undo.");
+        }
+    }
+}
+public class TextEditorUndoV2 {
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        TextEditorUndoManager undoManager = new TextEditorUndoManager();
+
+        editor.type("Hello");
+        undoManager.save(editor); // save state: Hello
+
+        editor.type(" World");
+        undoManager.save(editor); // save state: Hello World
+
+        editor.type("!");
+        System.out.println("Current Content: " + editor.getContent()); // Hello World!
+
+        System.out.println("\n--- Undo 1 ---");
+        undoManager.undo(editor); // Back to: Hello World
+
+        System.out.println("\n--- Undo 2 ---");
+        undoManager.undo(editor); // Back to: Hello
+
+        System.out.println("\n--- Undo 3 ---");
+        undoManager.undo(editor); // Nothing left to undo
+    }
+}
+```
+## Benefits
+- **Encapsulation:** Editor’s internal state is never exposed directly to the client
+- **Clean undo logic:** The client doesn’t need to manage or interpret state — it just saves and restores
+- **Separation of concerns:** The `TextEditor` handles state, and the `TextEditorUndoManager` handles history
+- **Scalability:** Easy to extend with redo support, multi-level undo, or persistent versioning
+## Class Diagram
+![[Screenshot 2026-01-07 at 10.59.21 PM.png|700]]
+# Chain of Responsibility
+- lets you **pass requests along a chain of handlers**, allowing each handler to decide whether to process the request or pass it to the next handler in the chain.
+- A request must be handled by **one of many possible handlers**, and the sender should not be tightly coupled to any specific one.
+- **decouple request logic** from the code that processes it.
+- **flexibly add, remove, or reorder handlers** without changing the client code.
+## Example - Handling HTTP Requests
+```Java
+class Request {
+    public String user;
+    public String userRole;
+    public int requestCount;
+    public String payload;
+    public Request(String user, String role, int requestCount, String payload) {
+        this.user = user;
+        this.userRole = role;
+        this.requestCount = requestCount;
+        this.payload = payload;
+    }
+}
+
+```
+![[Screenshot 2026-01-07 at 11.04.03 PM.png|700]]
+```Java
+class RequestHandler {
+    public void handle(Request request) {
+        if (!authenticate(request)) {
+            System.out.println("Request Rejected: Authentication failed.");
+            return;
+        }
+        if (!authorize(request)) {
+            System.out.println("Request Rejected: Authorization failed.");
+            return;
+        }
+        if (!rateLimit(request)) {
+            System.out.println("Request Rejected: Rate limit exceeded.");
+            return;
+        }
+        if (!validate(request)) {
+            System.out.println("Request Rejected: Invalid payload.");
+            return;
+        }
+        System.out.println("Request passed all checks. Executing business logic...");
+        // Proceed to business logic
+    }
+    private boolean authenticate(Request req) {
+        return req.user != null;
+    }
+    private boolean authorize(Request req) {
+        return "ADMIN".equals(req.userRole);
+    }
+    private boolean rateLimit(Request req) {
+        return req.requestCount < 100;
+    }
+    private boolean validate(Request req) {
+        return req.payload != null && !req.payload.isEmpty();
+    }
+}
+public class App {
+    public static void main(String[] args) {
+        Request req = new Request("john_doe", "ADMIN", 42, "{ 'data': 123 }");
+        RequestHandler handler = new RequestHandler();
+        handler.handle(req);
+    }
+}
+```
+## Problems
+- **Violates OCP** - If you want to add a new step the entire class has to change.
+- **Poor Separation of concern**
+- **No Reusability**
+- **Inflexible Configuration**
+## Implementing Chain of Responsibility
+```Java
+interface RequestHandler {
+    void setNext(RequestHandler next);
+    void handle(Request request);
+}
+abstract class BaseHandler implements RequestHandler {
+    protected RequestHandler next;
+    @Override
+    public void setNext(RequestHandler next) {
+        this.next = next;
+    }
+    protected void forward(Request request) {
+        if (next != null) {
+            next.handle(request);
+        }
+    }
+}
+class AuthHandler extends BaseHandler {
+    @Override
+    public void handle(Request request) {
+        if (request.user == null) {
+            System.out.println("AuthHandler: ❌ User not authenticated.");
+            return; // Stop the chain
+        }
+        System.out.println("AuthHandler: ✅ Authenticated.");
+        forward(request);
+    }
+}
+class AuthorizationHandler extends BaseHandler {
+    @Override
+    public void handle(Request request) {
+        if (!"ADMIN".equals(request.userRole)) {
+            System.out.println("AuthorizationHandler: ❌ Access denied.");
+            return;
+        }
+        System.out.println("AuthorizationHandler: ✅ Authorized.");
+        forward(request);
+    }
+}
+class RateLimitHandler extends BaseHandler {
+    @Override
+    public void handle(Request request) {
+        if (request.requestCount >= 100) {
+            System.out.println("RateLimitHandler: ❌ Rate limit exceeded.");
+            return;
+        }
+        System.out.println("RateLimitHandler: ✅ Within rate limit.");
+        forward(request);
+    }
+}
+class ValidationHandler extends BaseHandler {
+    @Override
+    public void handle(Request request) {
+        if (request.payload == null || request.payload.trim().isEmpty()) {
+            System.out.println("ValidationHandler: ❌ Invalid payload.");
+            return;
+        }
+        System.out.println("ValidationHandler: ✅ Payload valid.");
+        forward(request);
+    }
+}
+class BusinessLogicHandler extends BaseHandler {
+    @Override
+    public void handle(Request request) {
+        System.out.println("BusinessLogicHandler: 🚀 Processing request...");
+        // Core application logic goes here
+    }
+}
+public class RequestHandler {
+    public static void main(String[] args) {
+        // Create handlers
+        RequestHandler auth = new AuthHandler();
+        RequestHandler authorization = new AuthorizationHandler();
+        RequestHandler rateLimit = new RateLimitHandler();
+        RequestHandler validation = new ValidationHandler();
+        RequestHandler businessLogic = new BusinessLogicHandler();
+
+        // Build the chain
+        auth.setNext(authorization);
+        authorization.setNext(rateLimit);
+        rateLimit.setNext(validation);
+        validation.setNext(businessLogic);
+
+        // Send a request through the chain
+        Request request = new Request("john", "ADMIN", 10, "{ \"data\": \"valid\" }");
+        auth.handle(request);
+
+        System.out.println("\n--- Trying an invalid request ---");
+        Request badRequest = new Request(null, "USER", 150, "");
+        auth.handle(badRequest);
+    }
+}
+```
+## Class Diagram
+![[Screenshot 2026-01-07 at 11.06.33 PM.png|700]]
+## Benefits
+- **Modularity:** Each handler is isolated and easy to test
+- **Loose Coupling:** Handlers don’t need to know who comes next
+- **Extensibility:** Easily insert, remove, or reorder handlers
+- **Clean Client Code:** Only responsible for building the chain and sending the request
+- **Open/Closed Compliant:** You can add new functionality (e.g., LoggingHandler) without touching existing code

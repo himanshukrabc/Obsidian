@@ -81,7 +81,7 @@ method.invoke(u);   // Hello Alice
 - **Security and Compliance requirements**
 - **Architecture with known long-term constraints** - Some abstraction may be necessary due to type of architecture
 ## 4. Law of Demeter
-- Avoid chaining of methods
+- Avoid chaining of methods.
 ```Java
 class OrderService{
 	public void displayFirstItemPrice(Customer customer) {
