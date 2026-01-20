@@ -91,16 +91,15 @@ class OrderService{
 }
 ```
 #### Issues
-##### High Coupling
+##### High Coupling -> Maintenance Nightmare
 - displayFirstItemPrice class id **deeply coupled** with the structure of the customer class.
 - If ShoppingCart start using Map or renames getProduct() or if Product pricing is obtained from a different method, the method will fail.
+- If you now want to change the Money Wrapper from Decimal to BigDecimal for more accuracy, you need to go and change every getPrice() implementation.
 ##### Encapsulation Violation
 - For this to work - 
 	Customer class exposes ShoppingCart class
 	ShoppingCart exposes Items list and Product class
 - All of this is a violation of encapsulation
-##### Maintenance Nightmare
-- If you now want to change the Money Wrapper from Decimal to BigDecimal for more accuracy, you need to go and change every getPrice() implementation.
 ##### Testability Issues
 - You need to mock everything -> customer with a shopping cart with items of products with price.
 ### Law of Demeter

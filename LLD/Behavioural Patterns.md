@@ -240,10 +240,28 @@ public class FitnessAppObserverDemo {
     }
 }
 ```
+## Push based vs Pull based Observers
+#### Push based
+- No casting, Observer is simple
+- Subject must know **what data every observer needs**
+- **Signature changes** if data grows -> update all observers.
+```Java
+public void update(int steps, int activeMinutes, int calories);
+```
+#### Pull based
+- Subject is simpler, Easy to add new observer needs  
+- Observer must cast (unless generics used)
+- Slightly more coupling
+```Java
+public void update(Subject subject){
+	FitnessData fd = (FitnessData) subject;
+}
+```
 ## Class Diagram
 ![[Screenshot 2026-01-06 at 5.16.51 PM.png|700]]
 # Strategy
 - lets you define classes with each encapsulated algorithms and make them interchangeable at runtime.
+- Strategy may rely on inheritance if algos have most of the logic in common and only a part varies.
 ## Shipping Cost Calculation
 ```Java
 class ShippingCostCalculatorNaive {
@@ -952,7 +970,7 @@ public class ReportAppTemplateMethod {
 - **Made the system extensible** — adding a new exporter (e.g., Excel) only requires creating a new subclass.
 - **Improved maintainability** — common logic changes only in one place.
 - **Reduced risk of errors** — the order of steps is controlled and protected by the abstract base class.
-# Visitor
+# Visitor<-*
 - lets you **add new operations to existing object structures** without modifying their classes.
 - The **Visitor Pattern** lets you **externalize operations** into separate visitor classes. 
 - Each visitor implements behavior for every element type, while the elements simply accept the visitor.
@@ -1070,6 +1088,29 @@ public class VisitorPatternDemo {
     }
 }
 ```
+## Double Dispatch
+- The following is double dispatch - 
+```Java
+Circle{
+	public void accept(Visitor visitor){
+		visitor.visitCircle(this);
+	}
+}
+```
+- Why not implement it in the following way?
+```Java
+class AreaVisitor implements ShapeVisitor{
+	public void visit(Circle c){
+	}
+	public void visit(Rectangle c){
+	}
+}  
+
+Shape s = new Circle();
+AreaVisitor av = new AreaVisitor();
+av.visit(s);
+```
+	- Because this is Method Overloading -> Resolved at compile time. So the complier will map the visit() to accept a parameter of type Shape. Hence, this will lead to errors.
 ## Benefits
 - **Decoupled logic:** Shape classes are clean; logic lives in visitors
 - **Open/Closed Principle:** Easily add new visitors (e.g., `JsonExporterVisitor`) without touching shapes
@@ -1077,7 +1118,9 @@ public class VisitorPatternDemo {
 - **Reusability & maintainability:** Each visitor focuses on one operation and is testable in isolation
 ## Class Diagram
 ![[Screenshot 2026-01-07 at 10.39.21 PM.png|700]]
-# Mediator
+# Interpretor
+
+# Mediator <-*
 - promotes **loose coupling** by preventing objects from referring to each other directly
 - As more components are added each component ends up handling its own logic plus knowledge of how to coordinate with others.
 - This leads to messed up code which is hard to understand.
@@ -1256,7 +1299,7 @@ public class MediatorApp {
 - **Reusability:** Components like `TextField`, `Button`, and `Label` can be reused in other contexts
 ## Class Diagram
 ![[Screenshot 2026-01-07 at 10.54.19 PM.png|700]]
-# Memento
+# Memento <-*
 - lets you **capture and store an object’s internal state** so it can be **restored later**, without violating encapsulation.
 - implement **undo/redo** functionality.
 - support **checkpointing or versioning** of an object’s state.
@@ -1365,9 +1408,40 @@ public class TextEditorUndoV2 {
 - **Clean undo logic:** The client doesn’t need to manage or interpret state — it just saves and restores
 - **Separation of concerns:** The `TextEditor` handles state, and the `TextEditorUndoManager` handles history
 - **Scalability:** Easy to extend with redo support, multi-level undo, or persistent versioning
+## Optimizing Memento for Large State (Interview-Grade Answer)
+
+### Approach 1: Store Deltas (Incremental Mementos)
+- Instead of storing the **entire state**, store **only what changed**.
+* Track modified fields, Memento stores `(field → oldValue)` pairs, Undo = apply reverse patch(Store mementos in a stack)
+**Pros**
+* Huge memory savings
+* Faster snapshot creation
+**Cons**
+* Undo logic becomes more complex
+* Redo needs careful handling
+* Order of operations matters
+### Approach 2: Command + Memento Hybrid
+Each action is a **Command** that:
+* Knows how to `execute()`
+* Knows how to `undo()`
+The Memento stores **only what the command needs** to undo.
+**Pros**
+* Clean separation of responsibilities
+* Scales well with complex workflows
+* Natural fit for undo/redo stacks
+**Cons**
+* More classes
+* Higher conceptual overhead
+### Approach 3: Limit History / Checkpointing
+* Keep only last **N** mementos
+* Or keep **periodic full snapshots** + deltas in between
+**Pros**
+* Predictable memory usage
+**Cons**
+* Can’t undo arbitrarily far back
 ## Class Diagram
 ![[Screenshot 2026-01-07 at 10.59.21 PM.png|700]]
-# Chain of Responsibility
+# Chain of Responsibility<-*
 - lets you **pass requests along a chain of handlers**, allowing each handler to decide whether to process the request or pass it to the next handler in the chain.
 - A request must be handled by **one of many possible handlers**, and the sender should not be tightly coupled to any specific one.
 - **decouple request logic** from the code that processes it.
@@ -1538,4 +1612,4 @@ public class RequestHandler {
 - **Loose Coupling:** Handlers don’t need to know who comes next
 - **Extensibility:** Easily insert, remove, or reorder handlers
 - **Clean Client Code:** Only responsible for building the chain and sending the request
-- **Open/Closed Compliant:** You can add new functionality (e.g., LoggingHandler) without touching existing code
+	- **Open/Closed Compliant:** You can add new functionality (e.g., LoggingHandler) without touching existing code

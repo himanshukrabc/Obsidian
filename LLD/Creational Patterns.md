@@ -105,7 +105,7 @@ class StaticBlockSingleton {
     }
 }
 ```
-### Enum Singleton
+	### Enum Singleton
 - Singleton is declared as an enum rather than a class. Hence we have only one instance.
 ```Java
 enum EnumSingleton {
@@ -118,6 +118,10 @@ enum EnumSingleton {
 ## Pros and Cons of Singleton Pattern
 ![[Screenshot 2025-12-25 at 2.35.40 PM.png|1000]]
 # Factory Method
+- *The tight coupling arises because the main logic uses `new` to create concrete objects.
+  To decouple, we introduce creator classes with a factory method(responsible for creation), 
+  The main logic only depends on the abstract creator. 
+  The conditional logic to choose which creator to use still exists in the main but doesn’t violate OCP.*
 - useful in situations where **the exact type of object** **to be created isn't known until runtime.**
 - implements **Open/Closed Principle** 
 - Allows the main classes to own the workflow while delegating the object creation logic which is most likely to change.
@@ -219,7 +223,9 @@ public class Main {
 - Now the NotificationFactory class is responsible for object creation and only this class has to be modified for adding new notification service.
 - However this still violates the Open Close Principle. -> The NotificationFactory class needs to change.
 ### Factory Method
+- **Factory Method should be thought of in isolation, not as an evolution of Simple Factory.**
 - Instead of using the SimpleFactory to create objects, you delegate the job to new creator classes.
+
 ```Java
 abstract class NotificationCreator {
     // Factory Method
@@ -265,7 +271,13 @@ public class Main {
 3. **Creator (e.g., NotificationCreator):** An abstract class (or an interface) that declares the factory method, which returns an object of type Product. It might also define a default implementation of the factory method. The Creator can also have other methods that use the product created by the factory method.
 4. **ConcreteCreator (e.g., EmailNotificationCreator, SMSNotificationCreator):** Subclasses that override the factory method to return an instance of a specific ConcreteProduct.
 # Abstract Factory
+- *Since you have multiple factory methods now, some methods may not be necessary for all the concrete classes. So you group the common ones together and create the abstract factory. It does not solve the OCP problem.*
 ### Where the Factory Method Breaks
+- If you have to create multiple objects, you need **multiple factory methods in the interface.**
+- Each time you have to create a new companion object, you need to change the interface. -> **Violates OCP**
+- **Some factory methods will go unused** for some concrete implementations
+- instead of one creator abstration creating all the classes why not have multiple creator abstractions each with one factory method and the abstract factroy will decide which one to create based on user preference?
+#### Example
 - Suppose instead of just the notification object, you had to create multiple objects. Eg - 
 	- Email → SMTP client + Email formatter
 	- Slack → Slack API client + Slack formatter
@@ -615,3 +627,16 @@ public class Game {
     }
 }
 ```
+
+# 
+**Factory Method** 
+-> It decouples the concrete classes dependency due to new method by creating creator classes. The method for creating the concrete class is called factory method.
+
+**Abstract Factory** 
+-> If you have to create multiple related objects, you need multiple factory methods. Not all factory methods will be useful for all concrete classes. So you club the common ones and make an abstract factory out of it.
+
+**Builder** 
+-> Builder is used when object construction is complex or has many optional configurations. Instead of passing many parameters or using nulls, we expose explicit step methods, allow chaining, and produce an immutable object in the end.
+
+**Prototype**
+-> Prototype is used to clone objects. You define an interface with a clone() and implement it by creating a new object with the current params.

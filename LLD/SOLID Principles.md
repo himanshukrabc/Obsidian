@@ -2,6 +2,7 @@
 - Each class should be responsible for a single responsibility -> *Separation of Concerns*
 - **Responsibility** - Reason for a class to change.
 - Do not create a **God Class** - which is responsible for everything.
+- **main orchestrating logic is also violation of SRP**
 ```java
 class Employee {
     private String name;
@@ -182,6 +183,8 @@ class PaymentProcessor {
 - **Not Anticipating the Right Extension Points** - Identifying where your system is likely to change is crucial.
 ## Liskov Substitution Principle
 - If Class S is subType of Class T then any object of Class S must be usable anywhere T is expected without breaking the code.
+- When you are inheriting, you should not change the inherited behaviour -> When overriding, you should not change the expectations that the base class set.
+- You start implementing and when you feel LSP is being violated, you split the responsibilities.
 #### Example
 ```Java
 class Document {
@@ -337,7 +340,7 @@ class DocumentProcessor {
 		- Changing validation logic in ways that break existing assumptions in client code is another LSP violation.
 ## Interface Segregation Principle
 - **Keep your interfaces focused**. Each interface should represent a specific capability or behavior.
-- Essentially the LSP of interfaces.
+- LSP tells you your deign is wrong, ISP fixes it.
 ```Java
 interface MediaPlayer {
     void playAudio(String audioFile);
@@ -480,6 +483,7 @@ class ComprehensiveMediaPlayer implements AudioPlayerControls, VideoPlayerContro
 - *High level modules should not depend on low level modules.* -> Inverted dependency.
 - *Abstractions should not depend on details of the implementation. Implementation must depend on abstraction.*
 - **There should be an interface/abstraction on which both High level and low level modules depend**
+- High level modules should depend on the abstractions, low level modules should implement those abstractions.
 ```Java
 class GmailClient {
     public void sendGmail(String toAddress, String subjectLine, String emailBody) {

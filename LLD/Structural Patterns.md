@@ -185,7 +185,7 @@ public class Main {
 ## Class Diagram
 ![[Screenshot 2026-01-03 at 4.49.01 PM.png|700]]
 ## Implementing Facade Pattern
-```Java
+```Java 
 class OrderFacade {
 
     private final InventoryService inventory = new InventoryService();
@@ -588,118 +588,152 @@ public class FileExplorerApp {
 - **Scalability**
 - **Maintainability**
 - **Extensibility**
+#### How does Composite help with the Open/Closed Principle here?
+Tomorrow if you need to add a new file type you can add it by implementing the interface and the client code will still treat it as the same.
+## Transparent vs Safe Composite
+- Transparent proxy will implement all the methods that are implemented by the whole or part in the interfact.
+- Safe composite will implement methods which are particular to part in part and like wise for whole.
+- Transparent Composite is useful when you have a client that does not need to know which concrete it is interacting with.
 # Proxy
-- Provides a **placeholder or surrogate** for another object, allowing you to **control access** to it.
-## Example - Image Gallery
+- Provides a **placeholder or surrogate** for another object, allowing you to **CONTROL ACCESS** to it.
+## Example - Document
 ```Java
-interface Image {
+public interface Document {
     void display();
-    String getFileName();
 }
-class HighResolutionImage implements Image {
-    private String fileName;
-    private byte[] imageData;
-    public HighResolutionImage(String fileName) {
-        this.fileName = fileName;
-        loadImageFromDisk(); // Expensive operation!
+public class RealDocument implements Document {
+    private final String id;
+    public RealDocument(String id) {
+        this.id = id;
+        //Expensive
+        loadFromRemoteServer();
     }
-    private void loadImageFromDisk() {
-        System.out.println("Loading image: " + fileName + " from disk (Expensive Operation)...");
-        try {
-            Thread.sleep(2000); // Simulate disk I/O delay
-            this.imageData = new byte[10 * 1024 * 1024]; // Simulate 10MB memory usage
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        System.out.println("Image " + fileName + " loaded successfully.");
+    private void loadFromRemoteServer() {
+        System.out.println("Loading document " + id + " from remote server...");
     }
     @Override
     public void display() {
-        System.out.println("Displaying image: " + fileName);
-    }
-    @Override
-    public String getFileName() {
-        return fileName;
+        System.out.println("Displaying document " + id);
     }
 }
+
 public class ImageGalleryAppV1 {
     public static void main(String[] args) {
-        System.out.println("Application Started. Initializing images for gallery...");
-
-        // Images are created eagerly – loaded even if not viewed!
-        Image image1 = new HighResolutionImage("photo1.jpg");
-        Image image2 = new HighResolutionImage("photo2.png");
-        Image image3 = new HighResolutionImage("photo3.gif");
-
-        System.out.println("\nGallery initialized. User might view an image now.");
-
-        // User clicks on image1
-        System.out.println("User requests to display " + image1.getFileName());
+        System.out.println("Application Started. Initializing documents...");
+        Document doc1 = new RealDocument("doc1.jpg");
+        Document doc2 = new RealDocument("doc2.png");
+        System.out.println("User requests to display " + doc1.getId());
         image1.display();
-
-        // User clicks on image3
-        System.out.println("\nUser requests to display " + image3.getFileName());
-        image3.display();
-
+        System.out.println("\nUser requests to display " + image3.getId());
+        image2.display();
         System.out.println("\nApplication finished.");
     }
 }
 ```
 ## Problems
-- **Resource-Intensive Initialization** - Images are loaded as soon as the page is loaded.
-- **No Control Over Access** - If you need to make any changes, eg - 
-	- Log every time an image is actually displayed.
-	- Add permission checks before loading a sensitive image.
-	- Cache previously loaded images for reuse.
-	You need to modify the HighResolutionImage class directly, mixing responsibilities.
+- **Resource-Intensive Initialization** - Documents are loaded as soon as the page is loaded.
+- **No Control Over Access** - 
 ## Implementing Proxy
+### Virtual Proxy - Lazy Loading
 ```Java
-class ImageProxy implements Image {
-    private String fileName;
-    private HighResolutionImage realImage;
-    public ImageProxy(String fileName) {
-        this.fileName = fileName;
-        System.out.println("ImageProxy: Created for " + fileName + ". Real image not loaded yet.");
+public class DocumentProxy implements Document {
+    private RealDocument realDocument;
+    private final String id;
+
+    public DocumentProxy(String id) {
+        this.id = id;
     }
+
     @Override
-    public String getFileName() {
-        // Can safely return without loading the image
-        return fileName;
+    public void display() {
+        if (realDocument == null) {
+            realDocument = new RealDocument(id); // lazy load
+        }
+        realDocument.display();
+    }
+}
+
+```
+### Protection Proxy - Adds Protection to the concrete class
+```Java
+public class SecureDocumentProxy implements Document {
+    private final Document document;
+    private final User user;
+    private final boolean confidential;
+    public SecureDocumentProxy(Document document, User user, boolean confidential) {
+        this.document = document;
+        this.user = user;
+        this.confidential = confidential;
     }
     @Override
     public void display() {
-        // Lazy initialization: Load only when display() is called
-        if (realImage == null) {
-            System.out.println("ImageProxy: display() requested for " + fileName + ". Loading high-resolution image...");
-            realImage = new HighResolutionImage(fileName);
-        } else {
-            System.out.println("ImageProxy: Using cached high-resolution image for " + fileName);
+        if (confidential && !user.isAdmin()) {
+            throw new SecurityException("Access denied");
         }
-        // Delegate the display call to the real image
-        realImage.display();
+        document.display();
     }
 }
-public class ImageGalleryAppV2 {
-    public static void main(String[] args) {
-        System.out.println("Application Started. Initializing image proxies for gallery...");
-        // Create lightweight proxies instead of full image objects
-        Image image1 = new ImageProxy("photo1.jpg");
-        Image image2 = new ImageProxy("photo2.png"); // Never displayed
-        Image image3 = new ImageProxy("photo3.gif");
-        System.out.println("\nGallery initialized. No images actually loaded yet.");
-        System.out.println("Image 1 Filename: " + image1.getFileName()); // Does not trigger image load
-        // User clicks on image1
-        System.out.println("\nUser requests to display " + image1.getFileName());
-        image1.display(); // Lazy loading happens here
-        // User clicks on image1 again
-        System.out.println("\nUser requests to display " + image1.getFileName() + " again.");
-        image1.display(); // Already loaded; no loading delay
-        // User clicks on image3
-        System.out.println("\nUser requests to display " + image3.getFileName());
-        image3.display(); // Triggers loading for image3
-        System.out.println("\nApplication finished. Note: photo2.png was never loaded.");
+```
+### Remote Proxy - Loads up the document from a remote server
+```Java
+public class RemoteDocumentProxy implements Document {
+    private final String documentId;
+    public RemoteDocumentProxy(String documentId) {
+        this.documentId = documentId;
+    }
+    @Override
+    public void display() {
+        System.out.println("Making network call to fetch document " + documentId);
+        // HTTP / gRPC / RMI call here
+        System.out.println("Displaying document " + documentId);
     }
 }
+```
+### Smart Proxy - Adds extra features to the document
+```Java
+public class LoggingDocumentProxy implements Document {
+    private final Document document;
+    public LoggingDocumentProxy(Document document) {
+        this.document = document;
+    }
+    @Override
+    public void display() {
+        System.out.println("LOG: Document accessed at " + System.currentTimeMillis());
+        document.display();
+    }
+}
+public class CachingDocumentProxy implements Document {
+    private final Document document;
+    private boolean cached = false;
+    public CachingDocumentProxy(Document document) {
+        this.document = document;
+    }
+    @Override
+    public void display() {
+        if (!cached) {
+            document.display();
+            cached = true;
+        } else {
+            System.out.println("Serving document from cache");
+        }
+    }
+}
+```
+### Chaining Proxies
+- **Protection -> Smart -> Virtual -> Remote**
+```Java
+Document doc =
+    new ProtectionProxy(
+        new CachingDocumentProxy(
+            new LoggingDocumentProxy(
+                new DocumentProxy(
+                    new RemoteProxy("document1")
+                )
+            )
+        ),
+        user,
+        true
+    );
 ```
 ## Benefits
 - Lazy Loading
@@ -724,7 +758,11 @@ public void display(String userRole) {
     realImage.display();
 }
 ```
-
+## When to stop with the Proxy
+- If there is a lot of logic in the proxy class, you should move the behavioural methods to decorators(like logging).
+## Decorator vs Proxy vs Factory
+- Proxy controls access. It is always there between client and the concrete class. Factory just creates and vanishes.
+- Decorator is used to extend methods. Proxy is used to control access.
 # Bridge
 - lets you **decouple an abstraction from its implementation**, allowing the two to vary **independently**.
 - Used when you have classes which can be extended in multiple orthogonal directions.
@@ -982,3 +1020,219 @@ public class FlyweightDemo {
 - **Separation of concerns:** Formatting logic and position/context are cleanly separated
 - **Reusability:** Glyphs for common characters are reused across the document
 - **Scalability:** Can handle thousands of characters with minimal memory footprint
+
+# 
+
+##### Adapter 
+-> Works as a bridge between two implementations.
+##### Facade
+-> Moves complicated interactions between classes to new facade classes.
+```Java fold
+class OrderFacade{
+    private final InventoryService inventoryService;
+    private final PricingService pricingService;
+    private final PaymentService paymentService;
+    private final ShippingService shippingService;
+    private final NotificationService notificationService;
+
+    // High level class is depending on low level classes. Violates Dependency Inversion Principle.
+    public OrderFacade(){
+        this.inventoryService = new InventoryService();
+        this.pricingService = new PricingService();
+        this.paymentService = new PaymentService();
+        this.shippingService = new ShippingService();
+        this.notificationService = new NotificationService();
+    }
+
+    public void placeOrder(User user, Item item){
+        if(inventoryService.checkAvailability(item)){
+            inventoryService.reserve(item);
+            double price = pricingService.calculatePrice(item, user); 
+            String paymentId = paymentService.initiatePayment(user,price);
+            if(paymentService.confirmPayment(paymentId)){
+                shippingService.createShipment(new Order(user, item));
+                notificationService.notifyUser(user, "Your order has been placed successfully.");
+            }
+        }
+    }
+}
+
+public class Main(){
+    public static void main(String[] args){
+        User user = new User();
+        Item item = new Item();
+        OrderFacade orderFacade = new OrderFacade();
+        orderFacade.placeOrder(user, item);
+    }
+    
+}
+```
+##### Decorator
+-> Used when you have a class where you want to add logic before or after the current logic withhout actually changing the class.
+-> As you want to change the functions of a class at runtime, you would pass a different class, so both of them should implement a common interface. The Decorator class will be an abstract class which accepts the concrete implementation of the interface. 
+-> The interface should thus contain all the methods you want to decorate
+ ```Java file:NotificationSender fold
+	interface NotificationSender {
+	    void send(String message);
+	}
+	class EmailNotificationSender implements NotificationSender {
+	    public void send(String message) {
+	        System.out.println("Sending email: " + message);
+	    }
+	}
+	abstract class NotificationDecorator implements NotificationSender {
+	    private NotificationSender sender;
+	    public NotificationDecorator(NotificationSender sender){
+	        this.sender = sender;
+	    }
+	    public abstract void send(String message);
+	}
+	class LoggingDecorator extends NotificationDecorator{
+	    public LoggingDecorator(NotificationSender sender){
+	        super(sender);
+	    }
+	    @Override
+	    public void send(String message){
+	        System.out.println("Sending Message....");
+	        this.sender.send(message);
+	        System.out.println("Message Sent");
+	    }
+	}
+	class EncryptionDecorator extends NotificationDecorator{
+	    private Encryptor encryptor;
+	    public EncryptionDecorator(NotificationSender sender,Encryptor encryptor){
+	        super(sender);
+	        this.encryptor = encryptor;
+	    }
+	    @Override
+	    public void send(String message){
+	        encryptor.encrypt(message);
+	        this.sender.send(message);
+	    }
+	}	
+	class RetryDecorator extends NotificationDecorator{
+	    private int retryCount=0;
+	    private int notificationTriggerCount = 0;
+	    public RetryDecorator(NotificationSender sender,int retryCount){
+	        super(sender);
+	        this.retryCount = retryCount;
+	    }
+	    @Override
+	    public void send(String message){
+	        try{
+	            this.sender.send(message);
+	        }
+	        catch(Error e){
+	            this.notificationTriggerCount++;
+	            if(notificationTriggerCount > retryCount){
+	                return;
+	            }
+	            this.send(message);
+	        }
+	    }
+	    public void setRetryCount(int retryCount){
+	        this.retryCount = retryCount;
+	    }
+	}
+```
+-> In the above code the retry logic is the issue. 
+**Decorator vs Facade**
+- Decorator is used when you have a single class
+- Use facade when multiple.
+##### Composite
+-> Treats wholes and aprts as the same.
+-> Favors uniformity so it is difficult to differentiate between the whole and the part.
+-> If a problem arises where you have to distinguish between the whole and the part, you can use an empty interface and differentiate using instanceOf. Here instanceOf does not cause a code smell as it is not breaking encapsulation.
+```Java fold
+
+
+abstract class Employee {
+    protected String name;
+    protected double salary;
+
+    public Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void printHierarchy(String indent) {
+        System.out.println(indent + name + " : " + salary);
+    }
+
+    public void add(Employee e) {
+        throw new UnsupportedOperationException();
+    }
+}
+class IndividualContributor extends Employee implements CanBeManaged {
+    public IndividualContributor(String name, double salary) {
+        super(name, salary);
+    }
+}
+class SeniorManager extends Employee implements CanBeManaged {
+    protected List<Employee> subordinates = new ArrayList<>();
+
+    public SeniorManager(String name, double salary) {
+        super(name, salary);
+    }
+
+    @Override
+    public void add(Employee e) {
+        subordinates.add(e);
+    }
+
+    @Override
+    public double getSalary() {
+        double total = salary;
+        for (Employee e : subordinates) {
+            total += e.getSalary();
+        }
+        return total;
+    }
+
+    @Override
+    public void printHierarchy(String indent) {
+        System.out.println(indent + name + " (Senior Manager)");
+        for (Employee e : subordinates) {
+            e.printHierarchy(indent + "    ");
+        }
+    }
+}
+class TeamLead extends Employee {
+    private List<Employee> subordinates = new ArrayList<>();
+
+    public TeamLead(String name, double salary) {
+        super(name, salary);
+    }
+
+    @Override
+    public void add(Employee e) {
+        if (!(e instanceof CanBeManaged)) {
+            throw new IllegalArgumentException("Cannot manage this employee type");
+        }
+        subordinates.add(e);
+    }
+
+    @Override
+    public double getSalary() {
+        double total = salary;
+        for (Employee e : subordinates) {
+            total += e.getSalary();
+        }
+        return total;
+    }
+
+    @Override
+    public void printHierarchy(String indent) {
+        System.out.println(indent + name + " (Team Lead)");
+        for (Employee e : subordinates) {
+            e.printHierarchy(indent + "    ");
+        }
+    }
+}
+```
+##### Proxy
+

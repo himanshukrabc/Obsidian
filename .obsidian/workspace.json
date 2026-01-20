@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "47c7c8fd0ef45087",
+        "id": "728d2593806298c7",
         "type": "tabs",
         "children": [
           {
-            "id": "02cd78a4293f6af3",
+            "id": "8d78672d694aaac0",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -22,21 +22,49 @@
             }
           },
           {
-            "id": "7be4a23cdbe5c707",
+            "id": "51526e23a5b732dd",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "LLD/Class Relationships.md",
+                "file": "LLD/Creational Patterns.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Class Relationships"
+              "title": "Creational Patterns"
+            }
+          },
+          {
+            "id": "94d236f17feef057",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "LLD/Structural Patterns.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Structural Patterns"
+            }
+          },
+          {
+            "id": "d10ba30c25a3b29e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "LLD/Behavioural Patterns.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Behavioural Patterns"
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -68,7 +96,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "solid principles",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -89,7 +117,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -197,13 +226,18 @@
       "obsidian-importer:Open Importer": false
     }
   },
-  "active": "7be4a23cdbe5c707",
+  "active": "d10ba30c25a3b29e",
   "lastOpenFiles": [
+    "LLD/Structural Patterns.md",
+    "LLD/Behavioural Patterns.md",
+    "LLD/Creational Patterns.md",
     "LLD/Index.md",
+    "LLD/UML.md",
+    "LLD/SOLID Principles.md",
     "LLD/Design Principles.md",
     "LLD/Class Relationships.md",
+    "OOPS_LLD/OOPs.md",
     "LLD/Additional Patterns.md",
-    "LLD/Behavioural Patterns.md",
     "Screenshot 2026-01-07 at 11.06.33 PM.png",
     "Screenshot 2026-01-07 at 11.04.03 PM.png",
     "Screenshot 2026-01-07 at 10.59.21 PM.png",
@@ -214,17 +248,12 @@
     "Image/Screenshot 2025-12-25 at 2.35.40 PM.png",
     "Image/Screenshot 2026-01-05 at 11.29.44 PM.png",
     "Image/Screenshot 2026-01-05 at 9.29.53 PM.png",
-    "LLD/Structural Patterns.md",
-    "LLD/Creational Patterns.md",
     "Additional Patterns.md",
     "Behavioural Patterns.md",
     "Structural Patterns.md",
     "Creational Patterns.md",
-    "LLD/UML.md",
-    "LLD/SOLID Principles.md",
     "Class Relations.md",
     "LLD",
-    "OOPS_LLD/OOPs.md",
     "Operating Systems/Virtualisation.md",
     "Operating Systems/Persistence.md",
     "Operating Systems/Concurrency.md",
