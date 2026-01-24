@@ -4,67 +4,67 @@
     "type": "split",
     "children": [
       {
-        "id": "728d2593806298c7",
+        "id": "754ef46619ac94d2",
         "type": "tabs",
         "children": [
           {
-            "id": "8d78672d694aaac0",
+            "id": "e2fd22d56f5ee1b8",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "LLD/Index.md",
+                "file": "HLD/System Design.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Index"
+              "title": "System Design"
             }
           },
           {
-            "id": "51526e23a5b732dd",
+            "id": "d0b418bd87205aaf",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "LLD/Creational Patterns.md",
+                "file": "Networking Basics.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Creational Patterns"
+              "title": "Networking Basics"
             }
           },
           {
-            "id": "94d236f17feef057",
+            "id": "8efe9c136426dc31",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "LLD/Structural Patterns.md",
+                "file": "Requirements.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Structural Patterns"
+              "title": "Requirements"
             }
           },
           {
-            "id": "d10ba30c25a3b29e",
+            "id": "beab7f02e0a9dc2e",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "LLD/Behavioural Patterns.md",
+                "file": "Scalability.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Behavioural Patterns"
+              "title": "Scalability"
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -96,7 +96,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "solid principles",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -117,8 +117,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -226,23 +225,33 @@
       "obsidian-importer:Open Importer": false
     }
   },
-  "active": "d10ba30c25a3b29e",
+  "active": "d0b418bd87205aaf",
   "lastOpenFiles": [
-    "LLD/Structural Patterns.md",
-    "LLD/Behavioural Patterns.md",
-    "LLD/Creational Patterns.md",
+    "Books/Operating Systems - Three Easy Pieces.pdf",
+    "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf",
+    "Books",
+    "untitled folder",
+    "HLD/System Design.md",
+    "Networking Basics.md",
+    "Requirements.md",
+    "Scalability.md",
+    "Untitled",
+    "OOPS_LLD/OOPs.md",
+    "Operating Systems/Operating Systems - Three Easy Pieces.pdf",
     "LLD/Index.md",
+    "LLD/Creational Patterns.md",
+    "LLD/Behavioural Patterns.md",
+    "LLD/Structural Patterns.md",
     "LLD/UML.md",
     "LLD/SOLID Principles.md",
     "LLD/Design Principles.md",
     "LLD/Class Relationships.md",
-    "OOPS_LLD/OOPs.md",
     "LLD/Additional Patterns.md",
-    "Screenshot 2026-01-07 at 11.06.33 PM.png",
-    "Screenshot 2026-01-07 at 11.04.03 PM.png",
-    "Screenshot 2026-01-07 at 10.59.21 PM.png",
-    "Screenshot 2026-01-07 at 10.54.19 PM.png",
-    "Screenshot 2026-01-07 at 10.39.21 PM.png",
+    "Image/Screenshot 2026-01-07 at 11.06.33 PM.png",
+    "Image/Screenshot 2026-01-07 at 11.04.03 PM.png",
+    "Image/Screenshot 2026-01-07 at 10.59.21 PM.png",
+    "Image/Screenshot 2026-01-07 at 10.54.19 PM.png",
+    "Image/Screenshot 2026-01-07 at 10.39.21 PM.png",
     "Image/Screenshot 2025-12-25 at 10.58.52 PM.png",
     "Image/Screenshot 2025-12-25 at 5.49.30 AM.png",
     "Image/Screenshot 2025-12-25 at 2.35.40 PM.png",
@@ -258,21 +267,12 @@
     "Operating Systems/Persistence.md",
     "Operating Systems/Concurrency.md",
     "DBMS/DBMS.md",
-    "HLD/System Design.md",
     "Notebook/BOSS.md",
     "Notebook/Docker.md",
-    "Notebook/ESG Reporting.md",
-    "Notebook/IIT D OS.md",
-    "Notebook/Kubernetes.md",
     "Personal",
     "Image/Personal",
     "Image/12.pdf",
     "12.pdf",
-    "DBMS",
-    "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared/People",
-    "Notebook",
-    "Notion/4455e7b0222e487f901e1508103725c0",
-    "Notion/Export-99f35db6-9620-4823-a7c2-8faa659cd87f/Private & Shared",
     "0-100/Untitled.canvas",
     "0-100/Untitled 1.canvas",
     "Obsidian/0-100/Untitled.canvas",
