@@ -30,6 +30,9 @@ Types of Delays which contribute to **Latency** are as follows
 - **Queuing Delay** - Time spent in the queue
 - **Transmission Delay** - Time for router to push data from top of queue into the outbound link.
 - **Propagation Delay** - Time for packet to move from one end to the other.
+##### Latency vs Response Time
+- Response Time is what client sees. It is the time taken to get a response for the request.
+- Latency is the amount of time a request is waiting to be handled.
 ### Queuing Delay and Packet loss
 - Each router maintains a **output queue/buffer** for each of the outbound links where packets will be placed.
 - Queuing delay can vary packet to packet.
