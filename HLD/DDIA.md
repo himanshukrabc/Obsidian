@@ -750,4 +750,304 @@ If any of these conditions are violated, DB will rollback.
 - **Byzantine Fault** - There are n nodes, some of which lie. Lying nodes are unknown.
 - **Byzantine fault-tolerant** - continues to operate correctly even if someof the nodes are malfunctioning and lying.
 ## Consistency and Consensus
+- **Consensus** - Making all nodes agree on something
+### Consistency Guarantees
+- Different data no two nodes because write requests arrive on different nodes at different times.
+- **Eventual Consistency** - If you stop writing, all the nodes will eventually return the same value.
+- Stronger consistency models come with performance treade-offs
+#### Eventual Consistency
+- New writes will be replicated but there is no time guarantees.
+- High availability and performance, Low consistency.
+#### [Sequencial Consistency][[#Total Order Broadcast(Sequential Consistency)]]
+#### Atomic Consistency(Linearizability)
+- **Atomic Consistency** - DB creates a illusion that there is only one replica. Every action on DB appears atomic.
+- **Recency Guarantee** - As soon as a write completes, all the reads have the access to the latest data.
+- Implemented using Consensus Algorithms
+##### Uses
+- **Leader Election** - Leader is elected by leasing a lock. This lease operation must be linearizable -> all nodes must agree on who the leader is. 
+- **Constraints and Uniqueness** - Username/email must be unique -> all nodes must agree that a username is available -> Linearizable.
+- **Cross Channel Dependencies** - If there are multiple channels of communication between 2 services in parallel. Eg - You write on DB and then send a msg on queue -> If not linearizable, race condition between msg queue and replication of DB.
+*Single Leader - possible, Consensus - Linearizable, Multi-Leader - Impossible, Leaderless - difficult*
+##### Cons
+- Requires coordination between nodes -> costs performance
+- High latency (network round trips to coordinate data).
+- Under partition → must sacrifice availability(To coordinate writes reads will have to be blocked).
+### CAP Theorem
+- Consistency, Availability and Partitions tolerance cannot be guaranteed together at all times.
+- **Limitations** - Here consistency refers to linearizability and availability is only one of the system faults that can occur.
+### Ordering Guarantees
+#### Total Ordering
+- Guarantees that all the writes will be ordered in the order that they were created.
+- Difficult to implement with distributed systems. On single node systems, can be implemented using locks and logs.
+- If a system implements linearizablity, it means there is a total order of requests.
+#### Causal Ordering
+- The order only matters if a request influences the consequent writes.
+- Causal order ensures that dependent requests are ordered but unrelated events might not be ordered properly.
+- Most systems usually only require causal ordering guarantees.
+- **Single Leader** - Use sequence numbers/ Timestamps/ Logical Clock to order the writes.
+- **Multileader/leaderless** - Generating causally ordered sequence numbers is difficult -> writes can go to any node.
+  Use time of day clock for timestamp -> Clock Skew. 
+  Numbers generated are based on number of requests arriving. Requests face network delays -> no guarantee of causality.
+##### Lamport Timestamp
+- (nodeId, counter) -> Counter decides which request is causally greater. If two have same counter, greater nodeId wins.
+- Each node keeps track of its own counter. If any request has a greater counter, it updates its own counter to that value.
+- Ensures causal order as follows - Request1 - (2,1), Request2(dependent on 1) -> (1,2). Request3(independent) -> (2,2).
+  R3 occurs before R2. But L(R3) > L(R2). -> 
+  If L(A)>L(B) that does not mean B occured before A. But if B occurred causally before A then L(B)<L(A).
+- **Logical Clocks** on the other hand ensures order of operations to detect concurrency.
+### Consensus
+- Refers to making nodes agree on something.
+- A consensus algorithm must satisfy the following properties - 
+	- **Uniform agreement** - No two nodes decide differently.
+	- **Integrity** - No node decides twice.
+	- **Validity** - If a node decides value v, then v was proposed by some node.
+	- **Termination** - Every node that does not crash eventually decides some value. It is assumed that if a node crashes it does not come back online. If a algo waits for nodes to come back, it violates termination(node may never comeback).
+- Termination is subject to the assumption that less than half of the nodes will crash at a time.
+- Byzantine faults can also be handled if less than 1/3rd of the nodes lie.
+#### 2 Phase Commit
+- **Atomic Commit** - Ensure atomicity for a distributed txn go to commit.
+- Uses a coordinator/txn manager which is a separate service.
+- Txn wants commit -> coordinator sends a *prepare request* to all nodes.
+- All nodes reply yes -> *commit request* sent to all nodes -> Node must make sure it commits(Yes reply only after txn logged to WAL)
+- Any node replies no -> *abort request* to all nodes.
+- If any prepare request fails/timeouts, the coordinator aborts the txn.
+  If any commit/abort request fails/timeouts, the coordinator must keep retrying until a response is received.
+- **Violates the Termination property** of consensus algorithms.
+##### Issues
+- Coordinator is a single point of failure. If it crashes, the entire DB crashes.
+- Poor performance as each txn has to wait through atleast 2 network calls.
+- If any node goes down the entire DB is stalled 
+- Txn stuck due to retries -> holds locks it leased which blocks other txns.
+#### Total Order Broadcast(Sequential Consistency)
+- Causal Ordering is not sufficient when you want to perform uniqueness checks. You need to know the total order.
+- TOB is a protocol for sending messages between nodes which has 2 guarantees -
+	- *Reliable Delivery* - No messages will be lost
+	- *Total Ordered Delivery* - Messages will arrive in the order they were sent.
+- Consensus algorithm. Can be thought of as a log with messages as entries.
+- Implemented by zookeeper/etcd.
+- Asynchronous in nature.
+##### Uses
+- **Replication** - To send writes across replicas
+- **Fencing Tokens** - Each request to acquire a lock is appended as a message in the service's queue.
+- **Linearizable Storage** - 
+  As total order is ensured, To check for uniqueness you use compare and set commands.
+  (Username will have 0 if unoccupied. Set to 1 if occupied. All subsequent requests will fail).
+  This does not ensure linearized reads -> Async requests so reads that occur before writes are broadcasted will be stale.
+##### Implementation
+- Linearizable register and compare and set operation. Every message can be assigned a id using this combination. This ensures order.
+- If a node recievs 6 before 5, it waits for 5.
+##### Consensus and Total Order Broadcast
+- Total Order Broadcast can be thought of as multiple rounds of consensus. 
+- In each round we make nodes agree on which message will flow to which node.
+#### ❌ Epoch Numbers
+- All Consensus algorithms internally use a leader in some form.
+- They define a epoch number and node having the same epoch number will have a unique leader always.
+- For any election/any decision by leader, the node trying to be the leader will send a request to all nodes and wait for response.
+- If the response reveal a node with a higher epoch number, then the node is not declared the leader/proposal is rejected.
+#### Limitations of Consensus
+- Voting for leader election/proposal, all are synchronous -> costs performance due to network delays and halting of DB.
+- Atleast more than half nodes should be functioning for consensus to work.
+- Consensus uses timeouts to detect failed nodes -> Some nodes may be declared dead falsely.
+#### Membership and Coordination Services
+- Zookeeper, Kafka, etcd provide coordination services.
+- They are key value stores with small enough data to fit in memory.
+- They implement Total Order Braodcast.
+- Features - 
+  - **Linearizable atomic operations** - Implements locks with a linearizable register. Locks acquired through compare and set and only one node can succeed to get any lock.
+  - **Total ordering of operations** - Linearizable register with *cas* operation -> incrementing ids can be generated -> total order.
+  - **Failure detection** - All nodes maintain session on zookeeper. There is constant polling to check for failure detection. 
+  - **Change notifications** - If any service depends on another, Zookeeper can send notifs to indicate if a node failed.
+- **Service Discovery** - All nodes/services must register itself on Zookeeper. As services fail and can come up on on new servers, any node trying to use a service should request zookeeper to give where(IP:Post) to direct this query.
+## Batch Processing
+### Unix Philosophy
+- Programs should do one thing well and you compose multiple programs together.
+- Data should be **immutable**.
+### MapReduce Model(Hadoop)
+- Used in large scale batch processing systems like Hadoop.
+- Just write code for mapper and reducer. MapReduce **automatically parallelizes** it.
+- MapReduce works in the following way -
+	- Read input files and break them up into records.
+	- **Mapper** called per record -> Extract key-value from each record. 
+	- Sort all the key-value pairs
+	- **Reducer** called per key-value pair -> Produce output based on key/value
+- **MapReduce Workflows** - chain several jobs together -> Ouput directory of one job becomes input of another.
+#### Distributed Execution of MapReduce
+- There is a **Master node** which schedules tasks and handles worker failures.
+- **Worker nodes** - Execute map and reduce tasks and store data locally.
+1. **Input Split** - Input is split into partitions. Each node may have multiple input splits stored.
+   One Map task is run for each input split.
+2. **Map Phase** -
+   Each map task converts the records in the split into key-value pairs. The logic is written by user.
+   Output is written to a file on disk.
+3. **Shuffle and Sort** - 
+   Mapper Output is ordered by keys and exposed over the network.
+   Reducer nodes fetch their partition of keys from each node.
+4. **Reduce Phase** - 
+   Key value pairs are reduced into the required information based on the user code.
+#### Fault Tolerance
+- If Mapper fails, map task is rerun on a different worker(as map is deterministic). 
+- If Reducer fails, reducer is rerun -> Fetch data from nodes -> generate output.
+### Joins
+#### Reduce-Side Join
+- Records may have foreign key references and final output would require data from the referenced records.
+- Query the DB once per record.
+- Use machine copy of DB instead of network calls to remote DB. The copy can be generated using Warehouse ETL process.
+#### Sort-Merge Join(Reduce-Side Join)
+- Map arranges the record such that the dependent records come later in the order(Causal Ordering).
+- Eg - Orders require User data. User record followed by all the orders of the user.
+- Reducer keeps the dependee records in memory.
+- **Skew/Hotspot** 
+	- One key has a lot of records in the second record set(*Hot Key*) -> Overloading of one Reducer. 
+	- Use Key-Salting -> Spread the same user over multiple keys and distribute orders accordingly.
+#### Broadcast Join(Map-side Join)
+- Small dataset is kept in memory. Large dataset is set for batch process and all references are mapped in-place.
+- Leads to no reduce phase as all data is processed in the map phase itself.
+- Faster, No shuffle cost.
+- **Cons** - Table must fit in memory.
+#### Partitioned Join(Map-side Join)
+- Partition both datasets using the same kay(on which join happens) -> Related records are present in the same partition.
+- Use the same Hash function and sort based on the same key -> Automatic ordering of the records.
+- No shuffle/reducer is required.
+- Very efficient
+- **Cons** - Preprocessing required. Harder to operate.
+### Output of Batch Processing
+#### Atomic Output Replacement
+- In case of workflows, another job reads the current job's output.
+- The downstream job should only be able to see either the old data or the new data. Partially written data should be hidden.
+- So you write to a new file and on success, you atomically rename the file.
+- This also helps in versioning of the job output.
+#### Side Effects
+- If Reducer directly calls a side effect, failures will lead to duplication issues.
+- Output should be deterministic -> Reducer not allowed to have side effects -> downstream job calls the side effect.
+#### Exactly-once semantics
+- Batch processes achieve this using Deterministic processing, Full Replacement Output and Avoiding in-place updates.
+- If a job fails you just rerun it.
+### Distributed DB vs Hadoop
+- DB stores data in structures. MapReduce has no such requirements input is a sequence of bytes.
+- DB is optimized for low latency queries. Hadoop is optimized for high throughput processing of entire data.
+- DB usually services OLTP loads. Hadoop services ETL jobs, Log Analysis etc.
+- Hadoop stores files in HDFS, with variable schema and immutable datasets.
+### Problems with MapReduce
+- **Intermediate States** - When you have 2 jobs queued, the output of 1st one has to be written on the HDFS before job 2 can start. This is a intermediate state which is expensive and redundant as it is temporary.
+- **Redundant Mapper** - Most times, mapping logic can be part of the previous producer.
+- MapReduce jobs can only start once the previous dependent jobs are all finished.
+- Sorting might not be required but mappers have inbuilt sort which is expensive both memory wise and complexity wise.
+### Dataflow Engines
+- Instead of using map and reduce functions, they define *operators*, which run on the files to generate output.
+- Parallelize the work by partitioning same as mapReduce.
+- No unnecessary map tasks and sorting is optional.
+- Can store the intermediate state in memory or on disc not in the HDFS.
+- Operators can start executing as soon as the input is ready. No need to wait to write it out to HDFS.
+#### Fault Tolerance
+- Since there is no intermediate state, durability is reduced. Task failures now have to reconstruct the state.
+- To reconstruct the state, the **operator must be deterministic** and the system needs to remember what operations it performed in which order.
+- If a fault occurs and the operator is not deterministic, all subsequent jobs need to be restarted -> **Cascading Failure**
+### Graph and Iterative Processing
+## Stream Processing
+- **Event** - Every record is also known as an event. Contains a timestamp, uniqueId(Idempotency) and key(for partitioning).
+- **Schema Evolution** - Event schema evolves over time. Events need to be backward and forward compatible. So add/remove optional fields only.
+### Producer 
+- publishes an event. Attaches a sequenceId(UID) to the event
+#### Processing Guarantees
+- **At-most-once** - No retries. Dataloss is possible.
+- **At-least once** - Retries are allowed. Possible duplicate processing of messages.(If a later message arrives earlier, it will be retried -> 2 processing cycles)
+- **Exactly once** 
+	- No loss and no duplicates 
+	- Requires
+		- *Transactional writes* - Multiple writes across partitions must either all succeed or all fail.(Distributed txn).
+		- *Idempotent producers* - Retries dont produce duplicates messages.
+		- *Atomic offset and output commits* - Consumer produces output and commits offset. If it crashes before commiting output, message will be retried. -> Ouput and offset commit should be atomic.
+##### Idempotence
+- Idempotent Operation -> Even if you perform it multiple times, result is the same as performing it once.
+- Make any event idempotent -> Use (procuderId, sequenceId) -> If broker processed it before, reject the event.
+### Message Brokers 
+- It is a distributed append-only log optimized for streamsing.
+- Defines offset for each event which is tracked by the consumer.
+- **Offset** - Each message is given a sequence number which is increasing. Order is guaranteed within the partition.
+- **Durability** - Depends on the broker -> some keep messages in memory while others write them to logs.
+#### Partitioning
+- Logs can be partitioned, each machine has 1 partition. A set of partitions can be dedicated to a Topic.
+- Every partition is assigned to one consumer in the consumer group.
+- Although one consumer can consume from multiple partitions.
+- Offsets guarantee the ordering of messages within a partition.
+### Consumer
+- processes the event. 
+- Maintains the offset of messages it has consumed.
+- *Backpressure* - If consumer is slow, broker must slow down the event production.
+- Kafka has a pull system -> Consumer controls read rate not the broker.
+#### Consumer Groups 
+- Groups of consumers assigned to process through the events of the same topic.
+- Types of parallelization
+	- **Load balancing** - Message is sent to the one of the consumers in the consumer group to parallelize processing.
+	- **Fan-out** - Message delivered to each consumer group so that they can carry out their own processing of messages.
+#### Rebalancing
+- Happens when a consumer drops/joins or the partition count changes.
+- Causes temporary pause as redistribution of partitions across consumers.
+- May lead to duplicate processing of messages.
+#### Hot partition problem
+- One partition is overloaded due to bad distribution of keys.
+- **Key-salting** -> If a key is too hot, split it into multiple keys(append 00 till 99 to the key -> 100 keys) -> better distribution across partitions.
+- **Dynamic Sharding** -> Hot keys initially have 1 key but as the messages increase, the number of keys assigned also increase.
+### Circular Bounded Buffer
+- Logs are only deleted after the disk is full.
+- So if a consumer falls behind such that the offset is pointing to a deleted log, it can lead to loss in messages.
+- However, the disk is very large -> Long time before messages get dropped -> Manually reset the consumer.
+### Change Data Capture
+- Used to keep data in different systems in sync.
+- Data changes to the DB are extracted and sent over a message broker to various data systems.
+- A connector reads DB's WAL and produces to a broker, all systems are consumers of this broker.
+- There needs to be an initial point from where the entire system will be built - 
+	- **Snapshot with offset** - Initial state of DB, build from this snapshot then consume the CDC. *Expensive, Point in time consistency*
+	- **Log Compaction** - A full view of the state, build from this and then consume CDC. *Continuous and latest data*
+#### External Side Effect Problem
+- If consumer has a side effect of message processing(Eg- write to DB, notifications), retries will lead to duplicate issues.
+- Use Idempotent Producers.
+- **Transactional Outbox Pattern** - Event processing and side effect are handled together as a txn.
+### Event Sourcing
+- All interactions with the application are logged as a stream of *immutable* events.
+- Instead of storing the data, you store the operations happening on the data. The state can be arrived at by going through the logs.
+- **Immutable Events** - Events cannot be modified.
+- **Append-only Log** - Events are written sequencially to the log.
+- **Derived State** - State can be derived by going through the sequence of events.
+- Command(issued by user) → Validate → Generate Event → Append to Log → Update Read Model
+#### Advantages
+- **Auditablity** - As events are immutable, the entire history of changes is available which helps in audit.
+- **Debugging and Replay** - Immutability makes debugging easy. You can just *replay the stream to rebuild* the state in case of *crash.*
+- **New Views and Easy Migration** - Making new views is simple, just run the stream and apply new filters to the data. Migration is simple because you can add your changes with the new filters.
+#### Disadvantages
+- **Complex**
+- **Migration needs to be backwards compatible**
+- **Replay is costly** - You need to store snapshots which is costly.
 
+### Reasoning about time
+- Each even needs to tagged with a timestamp. 
+- **Event Time** - Time at which the event occurred. **Processing Time** - Time at which the event is processed.
+- Processing time is different due to network delays, wait in queue etc.
+- Confusion between event time and processing time can lead to bad data. Eg - Measuring rate of requests -> If processing time, a server coming back up will process request faster(due to backlog) giving the illusion of a network spike.
+- **Straggler Events** - Event of an earlier timestamp arrives when the processor is computing the metrics of a different one.
+### Stream Joins
+#### Stream-stream join
+- Joining of two streams. Usually involves a time window.
+- Eg- Stream of user searches and Stream of purchases. Say you need to track number of purchases within 5min of a search.
+- Processor maintains a state in memory. In our eg, we track the last search and count the number of purchases.
+#### Stream-table joins
+- Joining of a stream with a changing table.
+- Eg- Stream of orders, you need to stamp the address based on the userId passed.
+- Usually done using a CDC for the table changes. So it is very similar to a stream-stream join.
+#### Table-table join
+- Involves 2 CDCs.
+- Used for maintaining derived views(indices etc), combining multiple CDCs.
+### Fault Tolerance
+How do we deal with consumer crashes
+#### Microbatching
+- Break streams into batches and retry the batch if anything fails.
+- Small batch size -> greater scheduling overhead, Large batch size -> greater delay in when the results are available.
+#### Checkpointing
+- Checkpoints are generated by writing the state to the disk. If crash -> restart from the last checkpoint.
+#### Stateful Processor Failure
+- A stateful processor must ensure that it is able to restore its state post failure.
+- Replicate the state by storing it in a different machine so that a new machine can take over.
+- Use logs to write out the state changes so that it can be rebuilt.
+#### Dead Letter Queue
+- If message fails repeatedly, you put it into the DLQ.
+- This prevents the pipeline blocking and infinite retry loops.
