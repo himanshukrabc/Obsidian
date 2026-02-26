@@ -62,7 +62,7 @@ Key aspects:
 - Vertex - ( id,  out_edges : List(edges), in_edges : List(edges),  properties : Map<String,String>)
 - Edge - ( id,  tail_vertex : vertex, head_vertex : vertex,  properties : Map<String,String>)
 - Can be thought of as 2 relational tables with JSON properties field.
-#### Triple Stores
+#### ❌Triple Stores
 - Store tree values which will indicate edge, node or property.
  - \_:vertex_name  
  - a -> relation
@@ -90,7 +90,7 @@ _:idaho a :Location.
 - Example - SQL, CSS
 - **Abstraction** - hides away internal details of how a query functions. Helps in performance improvements without any change in query.
 - **Parallel Execution** - Imperative languages are hard to parallelize due to the order of instructions. Declarative languages have a better chance parallelize.
-### Map Reduce Queries
+### [Map Reduce Queries][[#Batch Processing]]
 - It is neither declarative, nor imperative. Somewhere in the middle.
 - Based on two functions, **map** - filters relevant data, **reduce** - makes sense out of this data.
 - Example - MongoDB
@@ -943,6 +943,15 @@ If any of these conditions are violated, DB will rollback.
 - To reconstruct the state, the **operator must be deterministic** and the system needs to remember what operations it performed in which order.
 - If a fault occurs and the operator is not deterministic, all subsequent jobs need to be restarted -> **Cascading Failure**
 ### Graph and Iterative Processing
+- Graph algorithms run in multiple rounds. Update the node state repeatedly until convergence -> *Iterative*
+- MapReduce is expensive -> In one iteration only a small number of nodes will update. 
+- Running mapReduce multiple times -> Multiple writes and reads of entire dataset.
+#### Message Passing Model
+- Each vertex has a state.
+- In each iteration, each vertex will send out messages based on its state to outgoing edges.
+- Vertex will then update its own state until the entire state of dataset converges.
+- **Hard to Partition** - There will be multiple edges between partitions making it expensive to send messages.
+- **Spark is better** -> Stores intermediate state in memory so no writes to disk.
 ## Stream Processing
 - **Event** - Every record is also known as an event. Contains a timestamp, uniqueId(Idempotency) and key(for partitioning).
 - **Schema Evolution** - Event schema evolves over time. Events need to be backward and forward compatible. So add/remove optional fields only.
