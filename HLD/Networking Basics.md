@@ -131,7 +131,7 @@ Content-Type: text/html                        - Type of content
   Used to distribute traffic between multiple servers of the same host.(Host mapped to multiple IPs)
 - It has a DB distributed between multiple servers. Servers communicate between each other using UDP.
 - Browser -> DNS Client on user machine -> DNS Servers
-- Advantages of centralized DNS 
+- disadvantages of centralized DNS 
   Single Point of Failure, Huge Centralized DB, High Traffic and Maintenance.
 - Types of DNS Servers -> 
   **Root Server** - Contains addresses of TLD Servers. 13 in total.

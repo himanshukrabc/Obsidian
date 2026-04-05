@@ -87,34 +87,6 @@ _:idaho a :Location.
 - Common in document stores.
 - Advantages - **Faster reads**, **Better locality**
 - Cons - **Slow writes**, **Inconsistency**
-## ❌ Query Languages
-### Declarative Languages
-- Instead of telling the machine how to do something, tell it what to do. Machine will internally handle the optimizations and logic required.
-- Example - SQL, CSS
-- **Abstraction** - hides away internal details of how a query functions. Helps in performance improvements without any change in query.
-- **Parallel Execution** - Imperative languages are hard to parallelize due to the order of instructions. Declarative languages have a better chance parallelize.
-### [Map Reduce Queries][[#Batch Processing]]
-- It is neither declarative, nor imperative. Somewhere in the middle.
-- Based on two functions, **map** - filters relevant data, **reduce** - makes sense out of this data.
-- Example - MongoDB
-```js
-db.observations.mapReduce(
-	function map() {
-		var year = this.observationTimestamp.getFullYear();
-		var month = this.observationTimestamp.getMonth() + 1;
-		emit(year + "-" + month, this.numAnimals);
-	},
-	function reduce(key, values) {
-		return Array.sum(values);
-	},
-	{
-		 query: { family: "Sharks" },
-		 out: "monthlySharkReport"
-	}
-);
-```
-- **Limits** - map and reduce cannot perform internal queries. They can only operate on data passed into them.
-		- map() and reduce() must be carefully coordinated. SQL is usually easier to write that this.
 ## Data Storage and Retrieval
 ### Basic DB Mechanics
 - db_set() -> appends key value pair at the end of a document. -> **Great performance**
@@ -144,6 +116,7 @@ db.observations.mapReduce(
 - *Sorted String Tables* - On disk DS where the index of the table is sorted.
 - **Writes** - First to WAL then to an in memory table implemented using self balancing trees(AVL/Red Black Tree).
 - **Memory Full** - Data flushed onto a SS Table.
+- **Range Queries** - Find the SSTables within the range. Get data and merge with in-memory data.
 - [ ] **DB Crashes** - In memory writes -> **Write-ahead Log(WAL)** -> Key,Value pair is first appended to log to prevent data loss in case of DB Crash.
 - [ ] **Easy Merges/Compaction** - Simple merge sort algorithm to be used.
 - ==Lucene==-Used by Elasitc Search uses similar architecture. Key-word, Value-Id of Doc. 
@@ -426,6 +399,7 @@ record Person {
 - If anti entropy process is not there, some lagged data may never be updated.
 #### Quorum based systems
 - When a read/write request is made, request is routed to all nodes.
+- Each key is hashed and a few nodes are responsible for its quorum.
 - Let n = replicas, 
   w =#write acknowledgments after which write is successful, 
   r =#read acknowledgments after which read is successful
@@ -437,7 +411,7 @@ record Person {
 ##### Sloppy Quorum
 - Reads and writes may go to any reachable nodes(if designated nodes are down).
 - **Hinted Handoff**- Once the node is up, the updates are handed off to it.
-- Increases availability but even when w+r>n, you might get stale values.
+- Increases availability but even when w+r>n, you might get stale values.(as the node having the write is down)
 ##### Limitations of Quorum
 - **Concurrent Writes** - Two writes succeed on different replicas, no consensus on which value is fresh.
 - **Replication lag** - Only n-w replicas are updated. For the write to propagate there is replication lag. If r nodes are queried for read, they will still give stale data.
@@ -458,6 +432,8 @@ C1 writes C -> DB reads v=2, (C,3)
 ```
 ##### Version Vectors
 - Used in multi-leader replication.
+- Writes are stored in replicas with version vectors.
+- When replication happens, conflicting writes are identified based on the version vector.
 - Version number is stored per replica. The set of replicas queried will return a vector of version numbers.
 - If for 2 vectors u,v. Then u>v if ui>=vi for all i and ui>vi for at least one i.
 - If you cannot establish causality -> Resolve conflict.
@@ -471,7 +447,7 @@ If concurrent writes at A and B -
 V1 = [A:1, B:0]
 V2 = [A:0, B:1]
 Have application code deal with this.
-```
+``` 
 ## Partitioning
 - **Scalability, Higher Throughput and Parallel Reads/Writes**.
 - **Skewed Partitions**- Partitions where one partition handles more load than others. This partition is also called the *hot spot*
@@ -529,7 +505,7 @@ Have application code deal with this.
 	- Node routes internally if needed
 	- **Pros** - Simple clients, centralized control.
 	- **Cons** - Extra hop, Load balancer is a single point of failure.
-## Transactions
+## 🥊Transactions
 - Group of reads and writes -> If even one of them fails, all the writes are rolled back.
 ### ACID
 If any of these conditions are violated, DB will rollback.
@@ -658,8 +634,16 @@ If any of these conditions are violated, DB will rollback.
 - Different data no two nodes because write requests arrive on different nodes at different times.
 - Consistency models define what guarantees are offered to clients when reading data.
 #### Eventual Consistency
-- New writes will be replicated but there is no time guarantees.
+- **no ordering guarantees**
 - High availability and performance, Low consistency.
+#### Causal Consistency
+- **causal order**(Dependent req after dependee)
+- Implemented using lamport timestamps, logical clocks.
+- Eg - comments need to have causal consistency. 
+#### Sequencial Consistency
+- **Program order** -> requests ordered in the exact order that the client issued them.
+- **No recency guarantee** -> no guarantee that writes are visible immediately after they are processed. 
+- Eg - Single Leader, Quorum, Total Order Broadcast, Consensus.
 #### Linearizability(Atomic Consistency)
 - **Atomic Consistency** - DB creates a illusion that there is only one replica. Every action on DB appears atomic.
 - **Recency Guarantee** - As soon as a write completes, all the reads have the access to the latest data.

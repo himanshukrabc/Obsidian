@@ -4,24 +4,39 @@
     "type": "split",
     "children": [
       {
-        "id": "30e52b13f7b85369",
+        "id": "ccffd5e106882027",
         "type": "tabs",
         "children": [
           {
-            "id": "b08f2c4632cdf4bc",
+            "id": "09314408a16b24ee",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "HLD/DDIA.md",
+                "file": "HLD/Grokking Modern System Design.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "DDIA"
+              "title": "Grokking Modern System Design"
+            }
+          },
+          {
+            "id": "47071c543aeb47c1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Spring/Plan.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Plan"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -78,8 +93,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 211.50769424438477,
-    "collapsed": true
+    "width": 211.50769424438477
   },
   "right": {
     "id": "80131ccbed5be14b",
@@ -183,18 +197,28 @@
       "obsidian-importer:Open Importer": false
     }
   },
-  "active": "b08f2c4632cdf4bc",
+  "active": "47071c543aeb47c1",
   "lastOpenFiles": [
+    "Untitled 4.md",
+    "HLD/Grokking Modern System Design.md",
+    "Spring",
+    "HLD/DDIA.md",
+    "Untitled 3.md",
+    "Untitled 2.md",
+    "Screenshot 2026-04-03 at 7.28.29 PM.png",
+    "HLD/System Design.md",
+    "Screenshot 2026-03-19 at 12.22.36 PM.png",
+    "Spring/Plan.md",
+    "HLD/Networking Basics.md",
+    "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf",
+    "o.md",
     "Books/SystemDesignInterview.pdf",
     "SystemDesignInterview.pdf",
     "Books/Designing-data-intensive-applications.pdf.sb-b24fc7d5-aKWHc4",
     "Untitled.md",
-    "HLD/DDIA.md",
     "w.md",
-    "HLD/Networking Basics.md",
     "Books/Designing-data-intensive-applications.pdf.sb-b24fc7d5-TikpfG",
     "kdsljfads.md",
-    "HLD/System Design.md",
     "Books/Designing-data-intensive-applications.pdf",
     "Designing-data-intensive-applications.pdf",
     "DDIA.pdf",
@@ -202,9 +226,6 @@
     "Requirements.md",
     "DBMS/DBMS.md",
     "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf.sb-b24fc7d5-dNgBjV",
-    "Book-2Designing-data-intensive-applications.pdf",
-    "Books/Operating Systems - Three Easy Pieces.pdf",
-    "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf",
     "OOPS_LLD/OOPs.md",
     "LLD/Index.md",
     "LLD/Creational Patterns.md",
@@ -223,14 +244,7 @@
     "Image/Screenshot 2025-12-25 at 10.58.52 PM.png",
     "Image/Screenshot 2025-12-25 at 5.49.30 AM.png",
     "Image/Screenshot 2025-12-25 at 2.35.40 PM.png",
-    "Image/Screenshot 2026-01-05 at 11.29.44 PM.png",
-    "Image/Screenshot 2026-01-05 at 9.29.53 PM.png",
     "Additional Patterns.md",
-    "Behavioural Patterns.md",
-    "Structural Patterns.md",
-    "Creational Patterns.md",
-    "Class Relations.md",
-    "Operating Systems/Virtualisation.md",
     "0-100/Untitled.canvas",
     "0-100/Untitled 1.canvas",
     "Obsidian/0-100/Untitled.canvas",
