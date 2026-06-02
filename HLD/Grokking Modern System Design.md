@@ -84,6 +84,20 @@
 		- Each node stores - (Area it covers, # points, pointer to children).
 		- For the leaf node, if # points >threshold, split into 4 quads.
 		- **Efficient Range Queries** and **Proximity Detection**.
+	- **Geohashing** - 
+		- Divides the earth into rectangles by alternately splitting latitiude and longitude.
+		- At each step you choose one half -> Binary string -> Convert to base32 -> Geohash.
+		- *Nearby locations have similar prefixes.* -> Identify relative closeness.
+		- Simple and easy to store + partition.
+		- Easy to update location but precision is worse than quad trees.
+
+| Length | Area Size (approx) |
+| ------ | ------------------ |
+| 3      | ~150 km            |
+| 5      | ~5 km              |
+| 7      | ~150 m             |
+| 9      | ~5 m               |
+
 - **Load Balancing** - 
 	- Distribute incoming traffic among different servers. Prevents bottlenecks.
 ## Back-of-the-Envelope Calculations
@@ -611,6 +625,7 @@ Memcached latency	<1 ms
 - *Guarantees globally unique IDs, causality, 64-bit identifiers*
 - **Intervals overlap** - cannot determine order. **Complex**
 ## Distributed Monitoring
+
 
 ## Distributed Caching
 - Cache store data temporarily for faster retrieval.
@@ -1173,4 +1188,43 @@ Memcached latency	<1 ms
 - **Sandboxing:** Isolate code execution using containers (Docker) or virtual machines.
 - **Performance isolation:** Monitor resource utilization and cap or terminate tasks that exhibit atypical behaviour
 ## Sharded Counters
-- 
+- Likes, views etc are counters which need to handle concurrent updates across geo-distributed nodes.
+- **Heavy hitters problem** - Using locks to update counters leads to contention and bottlenecks.
+- **Sharded counter** - splits the counter into multiple shards -> Reduced contention and improved performance.
+### API Design
+##### createCounter(counter_id, number_of_shards)
+- We store the counterId, numberOfShards, MachineMappings etc on a DB.
+- **counter_id** - 
+- **number_of_shards** - Decided by heuristics like follower_count, post_type
+##### writeCounter(counter_id, action_type)
+- **action_type** - increment/decrement
+##### readCounter(counter_id)
+### Counter Creation
+- **Shard count**- 
+	- High shard count -> Read amplification, Low shard count -> Write contention and low throughput
+	- Shard count depends on the user who created the post, type of post etc.
+#### Dynamic Shard Count
+- Engagement with posts also follow a long-tail pattern -> More likes initially and then it diminishes.
+  For certain posts, if some celeb interacts -> engagement blows up.
+- For such patterns, you dynamically change the shard-count.
+- Monitor write load across servers -> Decide if a counter needs more or less shards.
+#### Burst of Writes
+- High traffic account interaction -> Huge engagement -> Write request burst.
+- Types of write distribution algo - 
+	- **Round Robin** - Pick a server and select the next N -> *Suffers from uneven distribution*
+	- **Random Distribution** - select N servers at random -> *Suffers from uneven distribution*
+	- **Metric-based Selection**
+### Manage Read Requests
+- Aggregate is calculated periodically stored in a cache -> High throughput and low latency.
+- But this leads to reduced accuracy.
+### Top K problem
+- *How do you retrieve the top K tweets for a user? How do you get the top K trends?*
+- **Region-wise top K** - Get the top K+x counter from the shard in the region and calculate the top K overall.
+- **Time Window** - Defines the time window of the 
+
+- The **global hashtag counter** aggregates all location-based counters.
+- **Location-based counters** track regional usage and compare it against a predefined threshold within a time window to identify trending hashtags.
+### Placement of Counters
+- Depends on the workload. 
+- Eg- Social media -> place close to the user -> Low latency updates. Local trends can be identified faster.
+- **Top K trends:** local Top K lists sent to server, merged to produce a global Top K list.

@@ -184,7 +184,7 @@ class PaymentProcessor {
 ## Liskov Substitution Principle
 - If Class S is subType of Class T then any object of Class S must be usable anywhere T is expected without breaking the code.
 - When you are inheriting, you should not change the inherited behaviour -> When overriding, you should not change the expectations that the base class set.
-- You start implementing and when you feel LSP is being violated, you split the responsibilities.
+- You start implementing and when you feel **LSP is being violated, you split the responsibilities.**
 #### Example
 ```Java
 class Document {

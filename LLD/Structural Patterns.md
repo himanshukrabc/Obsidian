@@ -634,90 +634,111 @@ public class ImageGalleryAppV1 {
 - **Resource-Intensive Initialization** - Documents are loaded as soon as the page is loaded.
 - **No Control Over Access** - 
 ## Implementing Proxy
-### Virtual Proxy - Lazy Loading
 ```Java
-public class DocumentProxy implements Document {
-    private RealDocument realDocument;
-    private final String id;
+public interface Document {
+    void display();
+}
 
-    public DocumentProxy(String id) {
+class PDFDocument implements Document {
+    private final String id;
+    public PDFDocument(String id) {
         this.id = id;
     }
-
+    private void loadPDF() {
+        System.out.println("Loading PDF document with ID: " + id);
+    }
     @Override
     public void display() {
-        if (realDocument == null) {
-            realDocument = new RealDocument(id); // lazy load
-        }
-        realDocument.display();
+        System.out.println("Displaying PDF document");
     }
 }
 
-```
-### Protection Proxy - Adds Protection to the concrete class
-```Java
-public class SecureDocumentProxy implements Document {
-    private final Document document;
-    private final User user;
-    private final boolean confidential;
-    public SecureDocumentProxy(Document document, User user, boolean confidential) {
-        this.document = document;
+public class ImageGalleryAppV1 {
+    public static void main(String[] args) {
+        System.out.println("Application Started. Initializing documents...");
+        Document doc1 = new RealDocument("doc1.jpg");
+        Document doc2 = new RealDocument("doc2.png");
+        System.out.println("User requests to display " + doc1.getId());
+        image1.display();
+        System.out.println("\nUser requests to display " + image3.getId());
+        image2.display();
+        System.out.println("\nApplication finished.");
+    }
+}
+// Remote Proxy -> requires concrete class dependency
+class RemoteProxy implements Document{
+    private Document doc;
+    private String id;
+    public RemoteProxy(String id){
+        this.id = id;
+    }
+    @Override
+    public display(){
+    // Another instance of lazy -> Do not implement in constructor or lazy violated.
+        String res = RESTClient.fetchDocument(id);
+        this.doc = new PDFDocument(res);
+        this.doc.display();
+    }
+}
+
+// Lazy -> Remote -> PDF - Requires concrete dependency
+class LazyPDFProxy implements Document{
+    private String id;
+    private Document doc;
+    public LazyPDFProxy(String id){
+        this.id = id;
+    }
+    @Override
+    public void display(){
+        if(doc==null){
+            doc = new RemoteProxy(this.id);
+        }
+        doc.display();
+    }
+}
+// Secure Proxy
+class SecurePDFProxy implements Document{
+    private User user;
+    private Document doc;
+    private AccessStrategy strat;
+
+    public SecurePDFProxy(User user, Document doc, AccessStrategy strat){
         this.user = user;
-        this.confidential = confidential;
+        this.doc = doc;
+        this.strat = strat;
     }
+
+    public void setStrategy(AccessStrategy strat){
+        this.strat = strat;
+    }
+
     @Override
-    public void display() {
-        if (confidential && !user.isAdmin()) {
-            throw new SecurityException("Access denied");
+    public void display(){
+        if(strat.canAccess(user, doc)){
+            doc.display();
         }
-        document.display();
-    }
-}
-```
-### Remote Proxy - Loads up the document from a remote server
-```Java
-public class RemoteDocumentProxy implements Document {
-    private final String documentId;
-    public RemoteDocumentProxy(String documentId) {
-        this.documentId = documentId;
-    }
-    @Override
-    public void display() {
-        System.out.println("Making network call to fetch document " + documentId);
-        // HTTP / gRPC / RMI call here
-        System.out.println("Displaying document " + documentId);
-    }
-}
-```
-### Smart Proxy - Adds extra features to the document
-```Java
-public class LoggingDocumentProxy implements Document {
-    private final Document document;
-    public LoggingDocumentProxy(Document document) {
-        this.document = document;
-    }
-    @Override
-    public void display() {
-        System.out.println("LOG: Document accessed at " + System.currentTimeMillis());
-        document.display();
-    }
-}
-public class CachingDocumentProxy implements Document {
-    private final Document document;
-    private boolean cached = false;
-    public CachingDocumentProxy(Document document) {
-        this.document = document;
-    }
-    @Override
-    public void display() {
-        if (!cached) {
-            document.display();
-            cached = true;
-        } else {
-            System.out.println("Serving document from cache");
+        else{
+            throw new Exception("Unauthorized access");
         }
     }
 }
+
+// Smart Proxy
+class SmartPDFProxy implements Document{
+    private Document doc;
+    public SecurePDFProxy(Document doc){
+        this.doc = doc;
+    }
+
+    @Override
+    public void display(){
+        //Some logic here
+        doc.display();
+        //Some logic here
+    }
+}
+
+Document myDoc = new SecurePDFProxy(user, new SmartPDFProxy( new LazyPDFProxy(id)), strat);
 ```
 ### Chaining Proxies
 - **Protection -> Smart -> Virtual -> Remote**
@@ -792,6 +813,7 @@ class VectorRectangle extends Shape {
         System.out.println("Drawing Rectangle as VECTORS");
     }
 }
+```
 ```java
 public class App {
     public static void main(String[] args) {
@@ -1071,6 +1093,14 @@ public class Main(){
 -> Used when you have a class where you want to add logic before or after the current logic withhout actually changing the class.
 -> As you want to change the functions of a class at runtime, you would pass a different class, so both of them should implement a common interface. The Decorator class will be an abstract class which accepts the concrete implementation of the interface. 
 -> The interface should thus contain all the methods you want to decorate
+-> In the above code the retry logic is the issue. 
+**Decorator vs Facade**
+- Decorator is used when you have a single class
+- Use facade when multiple.
+##### Composite
+-> Treats wholes and aprts as the same.
+-> Favors uniformity so it is difficult to differentiate between the whole and the part.
+-> If a problem arises where you have to distinguish between the whole and the part, you can use an empty interface and differentiate using instanceOf. Here instanceOf does not cause a code smell as it is not breaking encapsulation.
  ```Java file:NotificationSender fold
 	interface NotificationSender {
 	    void send(String message);
@@ -1134,20 +1164,12 @@ public class Main(){
 	        this.retryCount = retryCount;
 	    }
 	}
-```
--> In the above code the retry logic is the issue. 
-**Decorator vs Facade**
-- Decorator is used when you have a single class
-- Use facade when multiple.
-##### Composite
--> Treats wholes and aprts as the same.
--> Favors uniformity so it is difficult to differentiate between the whole and the part.
--> If a problem arises where you have to distinguish between the whole and the part, you can use an empty interface and differentiate using instanceOf. Here instanceOf does not cause a code smell as it is not breaking encapsulation.
-```Java fold
-
+	```
+abstract class Employee {
+    
 
 abstract class Employee {
-    protected String name;
+	protected String name;
     protected double salary;
 
     public Employee(String name, double salary) {

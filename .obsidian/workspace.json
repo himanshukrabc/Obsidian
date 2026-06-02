@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "ccffd5e106882027",
+        "id": "f1058a2481037f65",
         "type": "tabs",
         "children": [
           {
-            "id": "09314408a16b24ee",
+            "id": "d0cba483106c00bd",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -22,21 +22,35 @@
             }
           },
           {
-            "id": "47071c543aeb47c1",
+            "id": "75f8e7af39d60c2d",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Spring/Plan.md",
+                "file": "HLD/DDIA.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Plan"
+              "title": "DDIA"
+            }
+          },
+          {
+            "id": "89935b8a01a11d4e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "LLD/Class Relationships.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Class Relationships"
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -197,54 +211,53 @@
       "obsidian-importer:Open Importer": false
     }
   },
-  "active": "47071c543aeb47c1",
+  "active": "89935b8a01a11d4e",
   "lastOpenFiles": [
-    "Untitled 4.md",
-    "HLD/Grokking Modern System Design.md",
-    "Spring",
+    "Problems.md",
     "HLD/DDIA.md",
-    "Untitled 3.md",
-    "Untitled 2.md",
-    "Screenshot 2026-04-03 at 7.28.29 PM.png",
+    "HLD/Grokking Modern System Design.md",
+    "Java/Java.md",
+    "Pasted image 20260520145128.png",
+    "Image/WhatsApp Image 2026-05-13 at 18.19.52.jpeg",
+    "Java/Spring & SpringBoot.md",
+    "Java/Multi-threading and Concurrency.md",
+    "Image/WhatsApp Image 2026-05-14 at 18.02.25.jpeg",
+    "Image/Screenshot 2026-05-14 at 6.01.14 PM.png",
+    "Image/1.jpeg",
+    "Image/Screenshot 2026-05-07 at 7.37.32 PM.png",
+    "Notebook/Java.md",
+    "LLD/Index.md",
+    "Image/Screenshot 2026-05-07 at 12.37.53 AM.png",
+    "Image/Screenshot 2026-04-30 at 9.53.58 AM.png",
+    "Image/Screenshot 2026-04-30 at 9.49.38 AM.png",
+    "Operating Systems/Concurrency.md",
+    "Image/Screenshot 2026-03-19 at 12.22.36 PM.png",
     "HLD/System Design.md",
-    "Screenshot 2026-03-19 at 12.22.36 PM.png",
-    "Spring/Plan.md",
-    "HLD/Networking Basics.md",
-    "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf",
+    "Java/Plan.md",
+    "Notebook/PL SQL.md",
+    "Notebook/Notebook.md",
+    "Notebook/Microservices.md",
+    "DBMS/DBMS.md",
+    "DBMS/SQL.md",
+    "Notebook/Docker.md",
+    "Notebook/ESG Reporting.md",
+    "Notebook/BOSS.md",
+    "Requirements.md",
     "o.md",
+    "Scalability.md",
+    "Untitled 4.md",
+    "LLD/Structural Patterns.md",
+    "LLD/Creational Patterns.md",
+    "Java",
+    "Spring",
+    "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf",
     "Books/SystemDesignInterview.pdf",
     "SystemDesignInterview.pdf",
     "Books/Designing-data-intensive-applications.pdf.sb-b24fc7d5-aKWHc4",
-    "Untitled.md",
-    "w.md",
     "Books/Designing-data-intensive-applications.pdf.sb-b24fc7d5-TikpfG",
-    "kdsljfads.md",
     "Books/Designing-data-intensive-applications.pdf",
     "Designing-data-intensive-applications.pdf",
     "DDIA.pdf",
-    "Scalability.md",
-    "Requirements.md",
-    "DBMS/DBMS.md",
-    "Books/Computer.Networking A Top-Down Approach 6th Edition.pdf.sb-b24fc7d5-dNgBjV",
-    "OOPS_LLD/OOPs.md",
-    "LLD/Index.md",
-    "LLD/Creational Patterns.md",
-    "LLD/Behavioural Patterns.md",
-    "LLD/Structural Patterns.md",
-    "LLD/UML.md",
-    "LLD/SOLID Principles.md",
-    "LLD/Design Principles.md",
-    "LLD/Class Relationships.md",
-    "LLD/Additional Patterns.md",
-    "Image/Screenshot 2026-01-07 at 11.06.33 PM.png",
-    "Image/Screenshot 2026-01-07 at 11.04.03 PM.png",
-    "Image/Screenshot 2026-01-07 at 10.59.21 PM.png",
-    "Image/Screenshot 2026-01-07 at 10.54.19 PM.png",
-    "Image/Screenshot 2026-01-07 at 10.39.21 PM.png",
-    "Image/Screenshot 2025-12-25 at 10.58.52 PM.png",
-    "Image/Screenshot 2025-12-25 at 5.49.30 AM.png",
-    "Image/Screenshot 2025-12-25 at 2.35.40 PM.png",
-    "Additional Patterns.md",
     "0-100/Untitled.canvas",
     "0-100/Untitled 1.canvas",
     "Obsidian/0-100/Untitled.canvas",

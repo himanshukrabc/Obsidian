@@ -913,3 +913,346 @@ This ensures no locks and no race conditions.
 | In-memory messaging       | Persistent messages   |
 | Fast, low latency         | Durable, slower       |
 | Handles logic             | Handles delivery      |
+
+## Back of the Envelope Calculations
+Before design, ALWAYS calculate:
+1. **API QPS**
+2. **Reads/sec (after amplification)**
+3. **Writes/sec (after fanout)**
+4. **Data per day/year**
+5. **Top bottleneck**
+#### Rules
+- Concurrent users = 1% of DAU.
+- Peak RPS = 10x average RPS
+- Read heavy systems - reads = (10 - 100) x writes
+- Rate = X req per day = X/84000 per sec = X * 1.2 * 10 ^ -5
+###### Example - 
+- 500M DAU
+- Each user watches **5 videos/day**
+- Average video size = **50 MB**
+- 10% users upload videos
+- Average upload size = **50 MB**
+
+- RPS = 2.5B per day ~ 30K per sec.
+  Peak RPS = 300K per sec.
+- WPS = 50M per day ~ 600rps
+  Peak WPS = 6K rps
+- Bandwidth - 
+  Each video = 50Mb upload, download
+  Total downloaded data = 2.5B videos * 50Mb per day = 125B Mb perday = 125M GB per day = 125 PB per day.
+  Download Bandwidth = 1.5 TB per sec
+## Consistency and Distributed Txn Patterns
+#### CQRS (Command Query Responsibility Segregation)
+- Separate DBs for Read and Write requests.
+- *Write DB* - Normalized, consistent. 
+  *Read DB* - Denormalized, eventually consistent.
+```
+Client → Write API → Write DB → Event → Update Read DB
+
+Client → Read API → Read DB
+```
+- **Tradeoffs** - Eventual Consistency, Complexity
+#### Event Sourcing
+- Store all events happening with the system.
+- Use write optimized DB based on append only logs.
+- Replicas maintain a view by aggregating the state.
+- *Snapshots* - help rebuild state in case of failure.
+```
+Command -> Validate -> Generate Event -> Store Event -> Update State
+```
+- **Tradeoffs** - Complexity, Bad Read Performance, Schema evolution.
+#### Saga Pattern
+- Used when -> Perform action involving multiple services each having their own DB.
+- If we use a global txn(2PC), we have to block other txns.
+```
+Order → Payment → Inventory
+```
+- Performs a **local transaction**, Each txn has a **compensating action** (undo) -> Instead of rollback.
+- **Choreography based** -
+	- Each service after completing generates an event, which is consumed by other service.
+	- *Pros* - Simple, Loosely Coupled.
+	  *Cons* - Hard to debug, Logic is scattered and difficult to track flow.
+- **Orchestration based** - 
+	- Central service is responsible for controlling other serivces.
+	- *Pros* - Simple Logic, Easy to Observe.
+	  *Cons* - Tight Coupling, SPOF.
+- Eventual Consistency, Requires Idempotency, Used for Handling Partial Failures.
+#### 2 Phase Commit
+- **Atomic Commit** - Ensure atomicity for a distributed txn commit.
+- Uses a *coordinator/txn manager* which is a separate service.
+- Txn wants commit -> coordinator sends a *prepare request* to all nodes.
+	- All nodes reply yes -> *commit request* sent to all nodes -> Node must make sure it commits(Yes reply after txn logged to WAL)
+	- Any node replies no -> *abort request* to all nodes.
+- If any prepare request fails/timeouts, the coordinator aborts the txn.
+  If any commit/abort request fails/timeouts, the coordinator must *keep retrying* until a response is received.
+- **Violates the Termination property** of consensus algorithms.
+##### Issues
+- Coordinator is a single point of failure.
+- **Poor performance**- each txn has atleast 2 network calls.
+- **Blocking Protocol**- Node failure leads to retries of txn -> holds locks it leased which blocks other txns.
+#### Transactional Outbox Pattern
+- Save data in DB and publish event to kafka at the same time.
+- Store data in a **Outbox table**- Store eventId, event details, origin_id etc.
+- A service periodically polls the outbox table to fetch the events to be fired.
+- **Pros** - No event if DB write fails, Protection against Message Queue failure.
+#### Inbox Pattern
+- Service **stores every incoming message/event in a DB table before processing it**
+- Some messages/events may be delivered twice(atleast once guarantee by queues) -> Process only once.
+- **Pros** - - Prevents message loss, Helps with retries, Enables deduplication
+#### Idempotency Pattern
+- processing the same request multiple times gives the same result
+- duplicates can happen - Network retries, Client retries, Message re-delivery
+- Use **idempotency key** and store processed keys. -> Duplicates not processed.
+#### Change Data Capture
+- Capture DB changes directly
+- DB → binlog → CDC tool → Kafka Eg- Debezium
+- No need for outbox table -> Works with legacy systems
+## Messaging and Event Driven Patterns
+#### Pub-Sub
+- Producer produces messages to a topic. All subscribers of the topic must receive messages.
+- *Steps* - 
+	- **Publisher publishes Message** - Message is sent to Broker.
+	- **Broker identifies topic and adds metadata**
+	- **Broker pushes the message** - into a queue(RabbitMQ)/log(Kafka).
+	- **Subscriber registers** - Broker manages registrations and subscriber is added as a consumer of the queue.
+	- **Consumer(Subscriber) processes messages** - 
+		- *Push Model* - Broker sends the messages to consumer.(RabbitMQ)
+		- *Pull Model* - Consumer is responsible to poll the broker to get the message.(Backpressure in Kafka)
+	- **Subscriber acks message**
+	- **Broker commits offset** - Store the offset of processed message -> Crash recovery.
+#### Event Notification vs Event carried State
+- Event notification -> Store data in DB, pass id -> *Extra DB fetch on read*.
+- Event carried State -> Send entire data through message -> *Large payload but faster consumers*.
+- **Tradeoff** - Payload size vs Latency
+#### Competing Consumers
+- RabbitMQ -> Multiple consumers can consume the same queue by attaching
+- Kafka -> Each queue has partitions - Each partition can be consumed by one consumer in a consumer group.
+  Multiple consumer groups can attach to the same queue.
+#### Dead Letter Queues
+- If a message keeps failing, you move it to the DLQ -> Prevent infinite retires.
+- Debug failures later
+#### At-Least-Once / At-Most-Once / Exactly-Once
+- **At-Least-Once** - Message delivered ≥1 times -> Duplicates -> Requires Idempotecy
+- **At-Most-Once** - Delivered once or never. Risk of data loss
+- **Exactly-Once** - Ideal but hard to achieve - Outbox + Inbox + Idempotency
+#### Ordering
+- Order matters in some systems. Eg- Chat System.
+- Solutions - **Keep one consumer per queue** or **Partition by DB key**
+#### Backpressure
+- Producer is faster than consumer
+- **At Queue level** - Consumer polls the queue for messages.
+- **Techniques at API level**- Queue buffering, Rate limiting and Reject requests (HTTP 429)
+#### Request Coalescing
+- Multiple reads with same query -> Do one DB call and return result.
+- Map<key, Promise> - stores hash(query params) as key, Promise to the ongoing request.
+- First request creates the Promise. Subsequent requests look for the promise in map, if found await on it.
+#### Hedged Requests
+- This is done in response to tail latency.
+- If a request is taking a lot of time, you send a backup request hoping to bypass the tail latency.
+## Read Write Optimization Patterns
+#### Materialized View Pattern
+- Precompute and Cache the results of expensive queries.
+- Example - News feed per user. Dashboard metrics/Analytics systems.
+- *Implementation* - Updates to DB -> events to Kafka -> Consumer updates the cache.
+- **Tradeoffs** - Fast Reads vs Eventual Consistency + Extra storage.
+#### Denormalization
+- Duplicate data to optimize reads -> Fewer joins.
+- **Tradeoff** - Data Duplication vs Read Latency
+#### Fan out on Read vs Write
+##### Fan-out on Write
+- When data is written → push it to all Materialized Views
+- **Tradeoffs** - Super fast reads vs Expensive Writes. Bad for users with large number of followers.
+##### Fan-out on Read
+- Compute feed when user opens app
+- Fetch posts from all followed users → merge → sort
+- **Tradeoffs**- Cheap writes vs Slow Reads, Complex queries.
+#### Read Repair
+- In a quorum system, replicas become inconsistent.
+- When the coordinator receives conflicting reads, it updates the inconsistent replica.
+#### Write Repair
+- Write fails on some replicas -> Fix later asynchronously
+- Ensures Eventual consistency
+#### Quorum-Based Replication
+#### Cache Aside vs Write Through vs Write Back
+- **Write Through** - Cache and DB are written to in the same txn.
+	- + High Consistency
+	- - High Latency.
+- **Write Back** - Data written to cache and then DB is updated asynchronously.
+	- + Low Latency
+	- - Eventual Consistency, Cache failure leads to data loss.
+- **Write Around** - Data is written to DB and cache is updated on a cache miss.
+	- + Applications that dont read immediately written data -> Avoid unused item in cache
+	- - Cache miss is expensive
+#### Hot Key Handling
+- Some keys get massive traffic
+- **Solution**- Replicate hot key, Cache aggressively and Shard key artificially
+#### Pagination & Windowing Pattern
+- Large datasets and you need fetch a set of results.
+- **Offset-based pagination**
+	- Use offset based queries
+	- **Pros** - Simple to implement, easy to jump to any page.
+	- **Cons** - Slow for large offsets as full scan to the offset, Inconsistent results if data changes.
+```SQL
+	SELECT * FROM posts
+	ORDER BY created_at DESC
+	LIMIT 10 OFFSET 20;
+```
+- **Cursor-based pagination**
+	- Use a **cursor (last seen value)** from a index.
+	- **Pros** - Fast, No skipping and consistent results.
+	- **Cons** - Cannot jump to arbitrary page easily, More complex API
+``` SQL
+	SELECT * FROM posts
+	WHERE created_at < '2026-01-01'
+	ORDER BY created_at DESC
+	LIMIT 10;
+```
+#### Ranking/Merging Patterns
+- When you get a request like top 20 posts. You have multiple(say 5) sources, and merge them into a final list.
+- Eg - You have feed list and you fetch posts from the celebs. -> Multiple sources -> One list required.
+##### K-way Merge
+- Treat each source as a **sorted list** and merge based on relevance score.
+	- **max heap on ranking score** -> Push top of precomputed feed, top post of each celebrity.
+	- **Pop the best item**, add the next item from that store.
+- `O(K log N)` → very efficient, No full reranking.
+##### Score-Based Merge (Light Re-ranking)
+- Precompute a **score** for each post based on recency, engagement.
+- At read time- Fetch candidates (~100 max) and apply **lightweight adjustments**:
+    - Boost recent celebrity posts
+    - Personalization tweaks
+- Keeps personalization flexible and avoids heavy ML inference at read time
+##### Two-Level Feed
+- Dont merge, interleave the lists.
+- Show: 15 items from precomputed and 5 items from celebrity.
+- Predictable latency and Avoids heavy ranking
+##### Pre-Merged Buckets
+- Maintain celebrity feed cache as well.
+## Reliability, Failure Handling & Multi-Region Patterns
+#### Retry Patterns
+- In case of transient failures, you do a retry.
+- *Retry Storm* - User calls -> System down -> 10K requests fail -> 10K Retry requests -> System overload and fails. This is a loop.
+- **Immediate Retry** - Causes load to increase on the system as multiple users try to retry again.
+- **Retry with a delay** - Retry periodically after x time. -> Leads to retry storms, does not consider load.
+- **Exponential Backoff** - Retry delay increases exponentially
+	- *Reduces load on a failing system*, *Gives time for recovery*.
+- **Retry with Jitter** - Exponential delay + Some randomness.
+	- Exp delay will still cause bulk of requests arriving at the same time -> Retry storm.
+	- With jitter, requests are spread apart.
+- *Ideal Retry* - Set timeout, Exponential Backoff and Idempotency.
+#### Circuit Breaker
+- A Circuit Breaker **stops your system from repeatedly calling a failing service**,
+- It has **3 states**:
+	- Closed - Requests go through normally, Failures are monitored
+	- Open - Too many failures → breaker opens, Calls are **blocked immediately**
+	- Half-Open - After some time → allow a few requests
+```Java
+Closed → (too many failures) → Open  
+Open → (after timeout) → Half-Open  
+Half-Open → success → Closed  
+Half-Open → failure → Open
+```
+- *Installed on the service side.*
+- **Pros** 
+	- *Prevents cascading failures* - One service failure does not impact another.
+	- *Fast Failure* - Client does not wait for timeouts.
+	- *Helps Recovery* - Moderates incoming traffic for a service that is recovering.
+- **Tradeoffs**
+	- *False Positives* - Service may recover and breaker is still waiting to send a request.
+	- *Added Complexity*
+#### Graceful Degradation
+- If services fail, return partial functionality instead of failing
+#### Heartbeat Pattern
+- Detect failed nodes by sending periodic signals.
+#### Active-Passive (Failover)
+- Keep one node as a standby to the leader node.
+- When the leader fails, quickly do a failover and make the standby as primary.
+- **Tradeoffs** - Simple and Safe vs Failover Delay
+#### Active-Active (Multi-Region)
+- Multiple regions serve traffic
+- **Tradeoffs** - Low latency, High availability vs Data consistency,Conflict resolution
+#### Geo-Partitioning
+- Store data close to users. Indian users → India DB, US users → US DB
+- Lower latency
+## Patterns I noticed
+### DB + Queue Txn
+- **Outbox Pattern**
+- **Change Data Capture**
+### Idempotency
+- Pass idempotency-key with request.
+- Store idempotency key in DB/Cache. Query the Cache/DB when the message comes in if it has been processed.
+- Have a uniqueness constraint on the idempotency-key.
+- Have a TTL for the records in this table.
+### Real Time Chat Application
+#### Ordering
+- Ordering is done per conversation. -> Partition based on conversation_id
+##### Hot Key
+- For a large group(1M+) - we need to use multiple consumers -> Order breaks. -> Relax ordering guarantee.
+- **Shard conversation into partitions**. *Number of shards* = (# write requests per sec)/(server capacity).
+- Partition the queue based on conversation_id and user_id. -> maintain user_id based ordering. 
+- Guarantees:
+    - per-sender ordering
+    - per-shard ordering
+    - best-effort global ordering
+#### Read Path
+- For online consumers, consumers send the message back by the connection management service.
+- Client updates which messages are read and updates the DB.
+- For offline users, consumers do nothing.
+- When user comes back, fetch message from DB.
+#### Connection Management Service
+- Maintains WebSocket connections records -> **KV Store Connection Registry** 
+  -> *user_id → [{server_id, connection_id}]* - Supports multiple devices per user
+- Tracks online users through **heartbeats**.
+	- **Connection Lifecycle** - 
+		- Client → LB → connection server -> Register in KV store
+	- **Heartbeat** - Periodic ping/pong to detect liveness
+	- **Disconnect** - Remove mapping (or expire via TTL)
+	- **Message Routing** - Consumer queries registry -> RPC to server -> pushes via WebSocket
+- **Optimizations**
+	- Local cache for active connections
+	- Batch routing per server
+	- Avoid per-user RPC calls
+- **Failure Handling**
+	- Server crash → stale entries → cleaned via TTL
+	- Stale routing → retry after refresh
+### L4 vs L7 Load Balancers
+- **L4** - Transport Layer(TCP/UDP), Decision based on IP+port, 
+	- No visibility into request.
+	- does NOT terminate application protocol -> Forwards TCP packets to the downstream server.
+- **L7** - Application Layer(HTTP/HTTPs), Decision based on URL, Header, cookies, 
+	- *Can look into requests*. -> As it read the request, it becomes the endpoint for the client.
+		-> L7 terminates TCP from Client -> LB creates another TCP to the Server.
+### Rate Limiter
+
+### Uber
+#### DB vs Cache — Quick Framework
+**1. Durability**
+* Must not lose → **DB else Cache**
+**2. Latency**
+* < 50 ms → **Cache**, else **DB OK**
+**3. Read QPS**
+* < 1K → **DB**
+* 1K–10K → **DB + cache**
+* > 10K → **Cache**
+**4. Write QPS**
+* < 1K → **DB**
+* 1K–10K → **DB (scaled)**
+* > 10K → **Cache / streaming**
+**5. Access Pattern**
+* Key lookup → **DB/Cache**
+* Geo / Top-N / Ranking → **Cache**
+* High-frequency updates → **Cache**
+* Historical / analytics → **DB**
+**6. Consistency**
+* Strong → **DB**
+* Eventual → **Cache**
+**7. Rule of thumb**
+* **Cache = speed**
+* **DB = source of truth**
+### Swiggy
+- Single Source of truth -> must be DB.
+- **Multi System Transaction** - Eg- DB + Cache write txn -> Write to DB, propagate through Queue.(Outbox)
+	- This ensures atomicity of updates.
+- Implement Idempotency everywhere -> Queue, Payments, Updates etc.
+- **CDC vs Async Queue Updates** -
+	- CDC generates binlog file and reads it later.
+	- Slower than Queue.

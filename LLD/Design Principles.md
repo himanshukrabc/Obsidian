@@ -28,7 +28,7 @@ if (EmailValidator.isValid(user.getEmail())) {
 #### When It Is Okay to Repeat
 - **Avoid Premature Abstractions** - Let the conditions arise for duplication, then only create the utility class.
 - **Keep Tests Readable** - Repeating a bit of test code improves clarity. Tests should be easy to read and understand.
-- **Simple code may be repeated** - code is extremely simple and unlikely to change, it may be better to repeat it.
+- **Simple code may be repeated** - code is extremely simple and unlikely to change, it may be better to repeat it.x
 ## 2. KISS - Keep it Simple, Stupid
 #### Why Complexity Is Dangerous
 - **Code is hard to read and understand**

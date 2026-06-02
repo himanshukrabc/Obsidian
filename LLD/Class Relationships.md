@@ -4,7 +4,6 @@
 - Objects are **loosely coupled** and can exist **independent of each other**.
 - ==Example== - 
   Student **has a** Teacher. Teacher **has a** Student. Teacher and Student both can exist without each other.
-
 ### UML Representation
 - **Solid line (—):** Represents an association between classes.
 ##### Directionality
@@ -110,7 +109,6 @@ class Group {
     private List<User> users = new ArrayList<>();
 }
 ```
-
 ## Aggregation
 - Aggregation is a **weaker form of the whole–part relationship**
 - Whole class contains references to other part classes, but the parts can **exist independently** of the whole.
@@ -131,7 +129,7 @@ class Group {
 ### Bad → Good → Great Example:
 #### Bad
 - A `Team` class has a method `createNewDeveloper()`, creating and destroying `Developer` objects internally. This creates tight coupling, making it behave like composition.
- ```Java
+- ```Java
  class Developer {
     private String name;
     public Developer(String name) { this.name = name; }
@@ -149,6 +147,7 @@ class Team {
     }
 }
 ```
+
 #### Good
 - A `Team` class holds a reference to `Developer` instances that are created elsewhere and passed to it. This is standard aggregation.
 ```Java

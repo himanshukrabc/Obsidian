@@ -9,17 +9,12 @@ Architecture Neutral : doesnot change based on wether it is 32bit or 64bit syste
   
 
 ### static
-
 ```SQL
 public static void main(String[] args){}
 ```
-
-static methods can be directly called by the class, no object declaration is required.  
-static ⇒ remains in the memory.  
-If we dont give static and keep on compiling, we get multiple class files. Now if we call the class, it wont compile due to multiple files. If we use static the main function will have the latest copy stored in the memory.
-
-  
-
+- static methods can be directly called by the class, no object declaration is required.  
+- static ⇒ remains in the memory.  
+- If we dont give static and keep on compiling, we get multiple class files. Now if we call the class, it wont compile due to multiple files. If we use static the main function will have the latest copy stored in the memory.
 ### Naming Convention
 
 For a file with multiple classes, save with the name of the public class always. In a file, there can be only one public class.

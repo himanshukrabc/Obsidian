@@ -105,7 +105,7 @@ class StaticBlockSingleton {
     }
 }
 ```
-	### Enum Singleton
+### Enum Singleton
 - Singleton is declared as an enum rather than a class. Hence we have only one instance.
 ```Java
 enum EnumSingleton {
